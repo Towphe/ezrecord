@@ -1,33 +1,71 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { HapticTab } from "@/components/haptic-tab";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { Tabs } from "expo-router";
+import React from "react";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+const TAB_ICON_SIZE = 28;
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors.light.tint,
         headerShown: false,
         tabBarButton: HapticTab,
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="statistics"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Statistics",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol
+              size={TAB_ICON_SIZE}
+              name="chart.bar.fill"
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="transactions"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Transactions",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={TAB_ICON_SIZE} name="archivebox" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="capture"
+        options={{
+          title: "Capture",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={TAB_ICON_SIZE} name="camera" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="products"
+        options={{
+          title: "Products",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol
+              size={TAB_ICON_SIZE}
+              name="storefront.fill"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: "Account",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={TAB_ICON_SIZE} name="person.fill" color={color} />
+          ),
         }}
       />
     </Tabs>
