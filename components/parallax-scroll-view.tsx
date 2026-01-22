@@ -51,9 +51,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
     overflow: "hidden",
+    height: "100%",
   },
 });
