@@ -7,10 +7,14 @@ module.exports = {
     // Only block runtime DB files and the `db` folder. Do NOT block
     // `drizzle/meta` because the app imports JSON/migration modules
     // from `drizzle/` at build-time; blocking those prevents resolution.
-    blockList: [/.*\.sqlite$/, /db\/.*/],
+    blockList: [/.*\.sqlite$/],
     // Map the `@` alias to the project root so Metro resolves `@/...` imports.
     extraNodeModules: {
       "@": path.resolve(__dirname),
+      // Metro sometimes doesn't honor package exports for subpath imports
+      // like `zod/v4/core`. Map that subpath to the actual file so bundler
+      // can resolve it.
+      "zod/v4/core": path.resolve(__dirname, "node_modules/zod/v4/core/index.js"),
     },
     // Ensure Metro resolves TypeScript files.
     sourceExts: ["js", "json", "ts", "tsx", "jsx"],
