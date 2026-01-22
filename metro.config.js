@@ -11,15 +11,10 @@ module.exports = {
     // Map the `@` alias to the project root so Metro resolves `@/...` imports.
     extraNodeModules: {
       "@": path.resolve(__dirname),
-      // Metro sometimes doesn't honor package exports for subpath imports
-      // like `zod/v4/core`. Map that subpath to the actual file so bundler
-      // can resolve it.
-      "zod/v4/core": path.resolve(
-        __dirname,
-        "node_modules/zod/v4/core/index.js",
-      ),
-      // Explicit mapping for top-level `zod` package to avoid resolution issues
-      zod: path.resolve(__dirname, 'node_modules/zod'),
+      // Route zod imports to a local shim so Metro doesn't fail resolving
+      // package subpaths like `zod/v4/core`.
+      "zod/v4/core": path.resolve(__dirname, "src/shims/zod-shim.js"),
+      zod: path.resolve(__dirname, "src/shims/zod-shim.js"),
     },
     // Ensure Metro resolves TypeScript files.
     sourceExts: ["js", "json", "ts", "tsx", "jsx"],

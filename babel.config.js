@@ -9,7 +9,8 @@ module.exports = function (api) {
           root: ["./"],
           alias: {
             "@": "./",
-            "zod/v4/core": "zod",
+            "zod/v4/core": "./src/shims/zod-shim",
+            zod: "./src/shims/zod-shim",
           },
         },
       ],
