@@ -19,7 +19,7 @@ module.exports = {
         "node_modules/zod/v4/core/index.js",
       ),
       // Explicit mapping for top-level `zod` package to avoid resolution issues
-      zod: path.resolve(__dirname, 'node_modules/zod/index.js'),
+      zod: path.resolve(__dirname, 'node_modules/zod'),
     },
     // Ensure Metro resolves TypeScript files.
     sourceExts: ["js", "json", "ts", "tsx", "jsx"],
