@@ -14,10 +14,15 @@ module.exports = {
       // Metro sometimes doesn't honor package exports for subpath imports
       // like `zod/v4/core`. Map that subpath to the actual file so bundler
       // can resolve it.
-      "zod/v4/core": path.resolve(__dirname, "node_modules/zod/v4/core/index.js"),
+      "zod/v4/core": path.resolve(
+        __dirname,
+        "node_modules/zod/v4/core/index.js",
+      ),
     },
     // Ensure Metro resolves TypeScript files.
     sourceExts: ["js", "json", "ts", "tsx", "jsx"],
+    // Use a custom resolver for specific problematic subpath imports.
+    resolveRequest: require('./rn-resolver').resolveRequest,
   },
   // Ensure Metro watches the project root for linked modules.
   watchFolders: [path.resolve(__dirname)],
