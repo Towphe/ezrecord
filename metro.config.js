@@ -2,12 +2,9 @@
 // Avoid using internal metro-config paths so this file works with package exports.
 module.exports = {
   resolver: {
-    // Only block generated runtime artifacts — don't block the whole `drizzle/`
-    // because the app imports source files like `drizzle/migrations`.
-    blockList: [
-      /drizzle\/meta\/.*$/,
-      /.*\.sqlite$/,
-      /db\/.*$/,
-    ],
+    // Only block runtime DB files and the `db` folder. Do NOT block
+    // `drizzle/meta` here because the app imports JSON/migration modules
+    // from `drizzle/` at build-time; blocking those prevents resolution.
+    blockList: [/.*\.sqlite$/, /db\/.*$/],
   },
 };
