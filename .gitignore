@@ -41,3 +41,15 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Drizzle runtime metadata and snapshots
+drizzle/meta/
+# Drizzle runtime DB files
+drizzle/*.sqlite
+
+# Local runtime DB files
+db/*.sqlite
+db/*.db
+
+# Local env
+.env
