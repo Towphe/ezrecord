@@ -1,8 +1,7 @@
 import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import type { PropsWithChildren } from "react";
-import { StyleSheet } from "react-native";
-import Animated, { useAnimatedRef } from "react-native-reanimated";
+import { StyleSheet, View } from "react-native";
 import { ThemedText } from "./themed-text";
 
 const HEADER_HEIGHT = 100;
@@ -10,40 +9,51 @@ const HEADER_BACKGROUND_COLOR = "#1D9BB2";
 
 type Props = PropsWithChildren<{
   title: string;
+  leftSibling?: React.ReactElement;
+  rightSibling?: React.ReactElement;
 }>;
 
-export default function ParallaxScrollView({ children, title }: Props) {
+export default function ParallaxScrollView({
+  children,
+  title,
+  leftSibling,
+  rightSibling,
+}: Props) {
   const backgroundColor = useThemeColor({}, "background");
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
 
   return (
-    <Animated.ScrollView
-      ref={scrollRef}
-      style={{ backgroundColor, flex: 1 }}
-      scrollEventThrottle={16}
+    <View
+      style={{
+        backgroundColor,
+        height: "100%",
+      }}
     >
-      <Animated.View
+      <View
         style={[styles.header, { backgroundColor: HEADER_BACKGROUND_COLOR }]}
       >
+        {leftSibling ? leftSibling : <ThemedView style={{ width: 10 }} />}
         <ThemedText style={[styles.title]}>{title}</ThemedText>
-      </Animated.View>
+        {rightSibling ? rightSibling : <ThemedView style={{ width: 10 }} />}
+      </View>
 
       <ThemedView style={styles.content}>{children}</ThemedView>
-    </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: "absolute",
+    top: 0,
   },
   header: {
     height: HEADER_HEIGHT,
     overflow: "hidden",
     flexDirection: "row",
-    flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
   },
   title: {
     marginTop: 40,
@@ -51,7 +61,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   content: {
-    overflow: "hidden",
-    height: "100%",
+    paddingVertical: 8,
+    height: "85%",
   },
 });
