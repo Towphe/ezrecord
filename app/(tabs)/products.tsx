@@ -1,23 +1,21 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { StyleSheet } from "react-native";
+import { CreateProduct } from "@/components/ui/product/create-product";
+import { ProductsHome } from "@/components/ui/product/product-home";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+const ProductScreenStack = createNativeStackNavigator();
 
 export default function ProductsScreen() {
   return (
-    <ParallaxScrollView title="Products">
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Products</ThemedText>
-      </ThemedView>
-      {/* <ThemedView style={styles.stepContainer}></ThemedView> */}
-    </ParallaxScrollView>
+    <ProductScreenStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProductScreenStack.Screen
+        name="ProductsHome"
+        component={ProductsHome}
+        options={{ animation: "none" }}
+      />
+      <ProductScreenStack.Screen
+        name="CreateProduct"
+        component={CreateProduct}
+        options={{ animation: "none" }}
+      />
+    </ProductScreenStack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-});
