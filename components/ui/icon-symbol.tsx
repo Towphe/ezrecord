@@ -13,8 +13,7 @@ type IconSymbolName = keyof typeof MAPPING;
 
 /**
  * Add your SF Symbols to Material Icons mappings here.
- * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
- * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
+ * - refer to https://hotpot.ai/free-icons for icon names (use SF symbol names)
  */
 const MAPPING = {
   "chart.bar.fill": "bar-chart",
@@ -22,6 +21,9 @@ const MAPPING = {
   "storefront.fill": "storefront",
   "person.fill": "person",
   camera: "photo-camera",
+  ellipsis: "more-horiz",
+  plus: "add",
+  magnifyingglass: "search",
 } as unknown as IconMapping;
 
 /**
