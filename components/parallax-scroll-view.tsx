@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   content: {
-    paddingVertical: 8,
     height: "85%",
   },
 });
