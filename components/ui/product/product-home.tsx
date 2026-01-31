@@ -50,6 +50,11 @@ export function ProductsHome() {
     >
       <ThemedView style={styles.page}>
         <ThemedView style={styles.productsContainer}>
+          {products.length === 0 && (
+            <ThemedText style={{ textAlign: "center" }}>
+              No products found.
+            </ThemedText>
+          )}
           {products.map((product) => (
             <ProductCard key={product.productId} {...product} />
           ))}
