@@ -1,3 +1,4 @@
+import { ActionButton } from "@/components/action-button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Product } from "@/types/products";
@@ -5,25 +6,7 @@ import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { Modal, Pressable, StyleSheet } from "react-native";
 import { IconSymbol } from "../icon-symbol";
-
-type ActionButtonProps = {
-  title: string;
-  color?: string;
-  onPress: () => void;
-};
-
-function ActionButton({ title, color, onPress }: ActionButtonProps) {
-  return (
-    <Pressable
-      style={{ width: "95%", marginHorizontal: "auto" }}
-      onPress={onPress}
-    >
-      <ThemedText style={[styles.actionButton, color ? { color } : {}]}>
-        {title}
-      </ThemedText>
-    </Pressable>
-  );
-}
+import { DeleteProductModal } from "./delete-modal";
 
 export function ProductCard({
   productId,
@@ -37,9 +20,15 @@ export function ProductCard({
 }: Product) {
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [deletedModalVisible, setDeletedModalVisible] =
+    useState<boolean>(false);
 
   const handleEditPress = () => {
     navigation.navigate("EditProduct", { productId: productId });
+  };
+
+  const handleDeletePress = () => {
+    setDeletedModalVisible(true);
   };
 
   const handleCancel = () => {
@@ -69,7 +58,13 @@ export function ProductCard({
                 <ActionButton
                   title="Delete Product"
                   color="red"
-                  onPress={() => {}}
+                  onPress={handleDeletePress}
+                />
+                <DeleteProductModal
+                  productId={productId}
+                  setModalVisible={setModalVisible}
+                  deletedModalVisible={deletedModalVisible}
+                  setDeletedModalVisible={setDeletedModalVisible}
                 />
               </ThemedView>
             </Pressable>
