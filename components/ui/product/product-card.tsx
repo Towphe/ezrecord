@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Product } from "@/types/products";
+import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { Modal, Pressable, StyleSheet } from "react-native";
 import { IconSymbol } from "../icon-symbol";
@@ -34,7 +35,16 @@ export function ProductCard({
   createdAt,
   updatedAt,
 }: Product) {
+  const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const handleEditPress = () => {
+    navigation.navigate("EditProduct", { productId: productId });
+  };
+
+  const handleCancel = () => {
+    setModalVisible(false);
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -53,14 +63,16 @@ export function ProductCard({
               setModalVisible(!modalVisible);
             }}
           >
-            <ThemedView style={styles.actionsModal}>
-              <ActionButton title="Edit Product" onPress={() => {}} />
-              <ActionButton
-                title="Delete Product"
-                color="red"
-                onPress={() => {}}
-              />
-            </ThemedView>
+            <Pressable style={{ flex: 1 }} onPress={handleCancel}>
+              <ThemedView style={styles.actionsModal}>
+                <ActionButton title="Edit Product" onPress={handleEditPress} />
+                <ActionButton
+                  title="Delete Product"
+                  color="red"
+                  onPress={() => {}}
+                />
+              </ThemedView>
+            </Pressable>
           </Modal>
         </ThemedView>
       </ThemedView>
