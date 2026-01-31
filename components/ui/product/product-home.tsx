@@ -2,7 +2,8 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useProducts } from "@/hooks/use-products";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { IconSymbol } from "../icon-symbol";
 import { ProductCard } from "./product-card";
@@ -27,6 +28,12 @@ export function ProductsHome() {
   const handleCreatePress = () => {
     navigation.navigate({ name: "CreateProduct" } as never);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   if (productLoading) {
     return (
