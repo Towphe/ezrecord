@@ -12,6 +12,7 @@ type InputFieldProps = {
   containerStyle?: object;
   labelStyle?: object;
   inputStyle?: object;
+  defaultValue?: any;
 };
 
 export function InputField({
@@ -23,6 +24,7 @@ export function InputField({
   containerStyle,
   labelStyle,
   inputStyle,
+  defaultValue,
 }: InputFieldProps) {
   return (
     <ThemedView style={[containerStyle]}>
@@ -30,17 +32,29 @@ export function InputField({
       <Controller
         control={control}
         name={fieldName}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={inputStyle}
-            placeholder={placeholder}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            autoCapitalize="words"
-            keyboardType={fieldType === "number" ? "numeric" : "default"}
-          />
-        )}
+        defaultValue={defaultValue}
+        render={({ field: { onChange, onBlur, value } }) => {
+          const displayValue = value == null ? "" : String(value);
+          return (
+            <TextInput
+              style={inputStyle}
+              placeholder={placeholder}
+              onBlur={onBlur}
+              onChangeText={(text) =>
+                onChange(
+                  fieldType === "number"
+                    ? text === ""
+                      ? undefined
+                      : Number(text)
+                    : text,
+                )
+              }
+              value={displayValue}
+              autoCapitalize={fieldType === "number" ? "none" : "words"}
+              keyboardType={fieldType === "number" ? "numeric" : "default"}
+            />
+          );
+        }}
       />
     </ThemedView>
   );
