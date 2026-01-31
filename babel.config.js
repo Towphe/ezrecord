@@ -13,6 +13,7 @@ module.exports = function (api) {
             zod: "./src/shims/zod-shim",
           },
         },
+        "react-native-worklets-core/plugin",
       ],
     ],
   };
