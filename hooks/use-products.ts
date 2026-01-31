@@ -1,5 +1,5 @@
 import { Product } from "@/types/products.ts";
-import { desc, like } from "drizzle-orm";
+import { and, desc, eq, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -17,10 +17,20 @@ export function useProducts() {
       try {
         const baseQuery = drizzleDb.select().from(schema.product);
 
+        const withoutDeleted = (query: any) =>
+          and(eq(schema.product.isDeleted, 0), query);
+
         const data =
           name && name !== ""
-            ? await baseQuery.where(like(schema.product.name, `%${name}%`))
-            : await baseQuery.orderBy(desc(schema.product.createdAt)).limit(10);
+            ? await baseQuery.where(
+                withoutDeleted(like(schema.product.name, `%${name}%`)),
+              )
+            : await baseQuery
+                .where(eq(schema.product.isDeleted, 0))
+                .orderBy(desc(schema.product.createdAt))
+                .limit(10);
+
+        console.log(data);
         setProducts(data);
       } catch (err) {
         console.log("Error fetching products:", err);

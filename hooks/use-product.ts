@@ -1,5 +1,5 @@
 import { Product } from "@/types/products.ts";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
@@ -17,7 +17,12 @@ export function useProduct(productId: string) {
       const data = await drizzleDb
         .select()
         .from(schema.product)
-        .where(eq(schema.product.productId, productId));
+        .where(
+          and(
+            eq(schema.product.productId, productId),
+            eq(schema.product.isDeleted, 0),
+          ),
+        );
 
       setProduct(data[0] || null);
     } catch (err) {
