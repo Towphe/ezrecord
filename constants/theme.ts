@@ -28,6 +28,7 @@ export const Colors = {
   teal: "#0a7ea4",
   green: "#33C744",
   red: "#EF3F3F",
+  yellow: "#F5A524",
 };
 
 export const Fonts = Platform.select({
