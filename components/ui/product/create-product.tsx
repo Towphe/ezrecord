@@ -20,10 +20,13 @@ export function CreateProduct() {
   const navigation = useNavigation();
   const { createProduct } = useCreateProduct();
 
-  const handleCancel = () => {
+  const navigateToHome = () =>
     navigation.navigate({
       name: "ProductsHome",
     } as never);
+
+  const handleCancel = () => {
+    navigateToHome();
   };
 
   const {
@@ -37,7 +40,7 @@ export function CreateProduct() {
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     createProduct(data);
-    console.log("Created Product", data);
+    navigateToHome();
   };
 
   return (
