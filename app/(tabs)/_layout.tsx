@@ -2,7 +2,6 @@ import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { Tabs } from "expo-router";
-import React from "react";
 
 const TAB_ICON_SIZE = 28;
 
