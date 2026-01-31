@@ -22,7 +22,10 @@ const MAPPING = {
   "person.fill": "person",
   camera: "photo-camera",
   ellipsis: "more-horiz",
-  plus: "add",
+  "plus.circle": "add-circle-outline",
+  "minus.circle": "remove-circle-outline",
+  "doc.plaintext": "receipt",
+  subtract: "subtract",
   magnifyingglass: "search",
 } as unknown as IconMapping;
 
