@@ -1,18 +1,28 @@
-import { CameraScreen } from "@/components/camera-screen";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { StyleSheet } from "react-native";
+import CaptureHome from "@/components/ui/capture/capture-home";
+import ReviewOrder from "@/components/ui/capture/review-order";
+import { SelectedProduct } from "@/types/product-selection";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+export type CaptureStackParamList = {
+  CaptureHome: { selectedProducts?: SelectedProduct[] | null };
+  ReviewOrder: { selectedProducts: SelectedProduct[] };
+};
+
+const CaptureScreenStack = createNativeStackNavigator<CaptureStackParamList>();
 
 export default function CaptureScreen() {
   return (
-    <ParallaxScrollView title="Capture">
-      {/* <ThemedView style={styles.absoluteFill}></ThemedView> */}
-      <CameraScreen />
-    </ParallaxScrollView>
+    <CaptureScreenStack.Navigator screenOptions={{ headerShown: false }}>
+      <CaptureScreenStack.Screen
+        name="CaptureHome"
+        component={CaptureHome}
+        options={{ animation: "none" }}
+      />
+      <CaptureScreenStack.Screen
+        name="ReviewOrder"
+        component={ReviewOrder}
+        options={{ animation: "none" }}
+      />
+    </CaptureScreenStack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  absoluteFill: {
-    flex: 1,
-  },
-});
