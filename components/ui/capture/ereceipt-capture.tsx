@@ -6,6 +6,7 @@ import { RouteProp } from "@react-navigation/native";
 import { useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { useTensorflowModel } from "react-native-fast-tflite";
+import ImageResizer from "react-native-image-resizer";
 import { PhotoFile } from "react-native-vision-camera";
 
 const YOLO_MODEL = require("../../../assets/models/yolo.tflite");
@@ -60,7 +61,6 @@ export default function EReceiptCapture({
       console.log("Starting detection...");
 
       // 1. Resize photo to exactly 640x640 using ImageResizer (resize plugin works with Frames, not PhotoFiles)
-      const ImageResizer = (await import("react-native-image-resizer")).default;
       const resizedPhoto = await ImageResizer.createResizedImage(
         `file://${photo.path}`,
         640,
