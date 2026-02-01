@@ -2,7 +2,7 @@ import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useNavigation } from "@react-navigation/native";
 import { Button, StyleSheet } from "react-native";
 import { ProductItem } from "./item-card";
 
@@ -11,11 +11,27 @@ export default function ReviewOrder({
 }: {
   route: RouteProp<CaptureStackParamList, "ReviewOrder">;
 }) {
+  const navigation = useNavigation();
   const { selectedProducts } = route.params;
   const total = selectedProducts.reduce(
     (sum, product) => sum + product.quantity * product.unitPrice,
     0,
   );
+
+  const handleEPayment = () => {
+    navigation.navigate({
+      name: "EReceiptCapture",
+      params: {
+        selectedProducts: selectedProducts,
+        totalAmount: total,
+      },
+    } as never);
+  };
+
+  const handleCashPayment = () => {
+    // Handle cash payment logic here
+    // simply create a transaction and update inventory
+  };
 
   return (
     <ParallaxScrollView title="Capture">
@@ -29,8 +45,8 @@ export default function ReviewOrder({
           <ThemedText style={styles.total}>
             Total: P {total.toFixed(2)}
           </ThemedText>
-          <Button title="E-Payment" color="teal" onPress={() => {}} />
-          <Button title="Cash" color="green" onPress={() => {}} />
+          <Button title="E-Payment" color="teal" onPress={handleEPayment} />
+          <Button title="Cash" color="green" onPress={handleCashPayment} />
         </ThemedView>
       </ThemedView>
     </ParallaxScrollView>

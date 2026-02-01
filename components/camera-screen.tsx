@@ -1,5 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Dimensions,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   Camera,
   PhotoFile,
@@ -7,11 +15,25 @@ import {
   useCameraFormat,
 } from "react-native-vision-camera";
 
-export function CameraScreen() {
+type Props = {
+  hasPermission: boolean;
+  setHasPermission: (granted: boolean) => void;
+  capturedPhoto: PhotoFile | null;
+  setCapturedPhoto: (photo: PhotoFile | null) => void;
+  processPhoto: (photo: PhotoFile) => Promise<void>;
+};
+
+export function CameraScreen({
+  hasPermission,
+  setHasPermission,
+  capturedPhoto,
+  setCapturedPhoto,
+  processPhoto,
+}: Props) {
   const device = useCameraDevice("back");
   const camera = useRef<Camera>(null);
-  const [hasPermission, setHasPermission] = useState(false);
-  const [capturedPhoto, setCapturedPhoto] = useState<PhotoFile | null>(null);
+
+  const { width, height } = Dimensions.get("window");
 
   const format = useCameraFormat(device, [
     { videoResolution: { width: 640, height: 480 } },
@@ -25,47 +47,66 @@ export function CameraScreen() {
     })();
   }, []);
 
-  const onCapture = async () => {};
+  const onCapture = async () => {
+    if (!camera.current) {
+      // TODO: handle error; state camera not ready
+      return;
+    }
+
+    const photo = await camera.current.takeSnapshot({ quality: 95 });
+
+    setCapturedPhoto(photo);
+
+    await processPhoto(photo);
+  };
+
   if (!device) return <Text>Loading Device...</Text>;
 
   if (capturedPhoto) {
+    // console.log("Captured");
     return (
-      <View style={styles.container}>
-        <Image
-          source={{ uri: `file://${capturedPhoto.path}` }}
-          style={StyleSheet.absoluteFill}
-          resizeMode="cover"
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => setCapturedPhoto(null)}
-        >
-          <Text style={styles.text}>Retake</Text>
-        </TouchableOpacity>
-      </View>
+      <Modal visible animationType="slide">
+        <View style={[styles.container, { width, height }]}>
+          <Image
+            source={{ uri: `file://${capturedPhoto.path}` }}
+            style={{ width, height }}
+            resizeMode="cover"
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setCapturedPhoto(null)}
+          >
+            <Text style={styles.text}>Retake</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     );
   }
 
-  if (!hasPermission)
+  if (!hasPermission) {
+    console.log("No camera permission");
     return <Text style={styles.text}>No Camera Permission</Text>;
+  }
 
   return (
-    <View style={styles.container}>
-      <Camera
-        ref={camera}
-        style={StyleSheet.absoluteFill}
-        device={device}
-        isActive={true}
-        format={format}
-        photo={true}
-      />
+    <Modal visible animationType="slide">
+      <View style={[styles.container, { width, height }]}>
+        <Camera
+          ref={camera}
+          style={{ width, height }}
+          device={device}
+          isActive={true}
+          format={format}
+          photo={true}
+        />
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.captureButton]} onPress={onCapture}>
-          <View style={styles.captureInner} />
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={[styles.captureButton]} onPress={onCapture}>
+            <View style={styles.captureInner} />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </Modal>
   );
 }
 
@@ -74,10 +115,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
-    right: 0,
-    bottom: 0,
     zIndex: 9999,
-    height: "100%",
   },
   buttonContainer: {
     position: "absolute",

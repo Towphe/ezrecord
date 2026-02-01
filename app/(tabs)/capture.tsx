@@ -1,4 +1,5 @@
 import CaptureHome from "@/components/ui/capture/capture-home";
+import EReceiptCapture from "@/components/ui/capture/ereceipt-capture";
 import ReviewOrder from "@/components/ui/capture/review-order";
 import { SelectedProduct } from "@/types/product-selection";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -6,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 export type CaptureStackParamList = {
   CaptureHome: { selectedProducts?: SelectedProduct[] | null };
   ReviewOrder: { selectedProducts: SelectedProduct[] };
+  EReceiptCapture: { selectedProducts: SelectedProduct[]; totalAmount: number };
 };
 
 const CaptureScreenStack = createNativeStackNavigator<CaptureStackParamList>();
@@ -21,6 +23,11 @@ export default function CaptureScreen() {
       <CaptureScreenStack.Screen
         name="ReviewOrder"
         component={ReviewOrder}
+        options={{ animation: "none" }}
+      />
+      <CaptureScreenStack.Screen
+        name="EReceiptCapture"
+        component={EReceiptCapture}
         options={{ animation: "none" }}
       />
     </CaptureScreenStack.Navigator>
