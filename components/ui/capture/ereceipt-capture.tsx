@@ -6,7 +6,6 @@ import { RouteProp } from "@react-navigation/native";
 import { useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { useTensorflowModel } from "react-native-fast-tflite";
-import ImageResizer from "react-native-image-resizer";
 import { PhotoFile } from "react-native-vision-camera";
 
 const YOLO_MODEL = require("../../../assets/models/yolo.tflite");
@@ -61,23 +60,21 @@ export default function EReceiptCapture({
       console.log("Starting detection...");
 
       // 1. Resize photo to exactly 640x640 using ImageResizer (resize plugin works with Frames, not PhotoFiles)
-      const resizedPhoto = await ImageResizer.createResizedImage(
-        `file://${photo.path}`,
-        640,
-        640,
-        "JPEG",
-        100,
-        0,
-        undefined,
-        false,
-        { mode: "contain", onlyScaleDown: false },
-      );
+      // const resizedPhoto = await ImageResizer.createResizedImage(
+      //   `file://${photo.path}`,
+      //   640,
+      //   640,
+      //   "JPEG",
+      //   100,
+      //   0,
+      //   undefined,
+      //   false,
+      //   { mode: "contain", onlyScaleDown: false },
+      // );
 
       const detectedObjects = await locatePaymentFields(
-        resizedPhoto.uri,
+        `file://${photo.path}`,
         model,
-        resizedPhoto.width,
-        resizedPhoto.height,
       );
 
       for (const obj of detectedObjects) {

@@ -195,57 +195,67 @@ export async function getRawBytes(fileUri: string): Promise<{
   };
 }
 
-function letterboxImage(
-  sourcePixels: Uint8Array, // Your decoded image data (RGB or RGBA)
-  srcWidth: number,
-  srcHeight: number,
-  srcChannels: number = 3,
+export function letterboxImage(
+  sourcePixels: Uint8Array,
+  srcWidth: number, // Original Image Width
+  srcHeight: number, // Original Image Height
+  srcChannels: number = 4, // Default changed to 4 based on your debug findings
   modelSize: number = 640,
+  // Cropping parameters
+  cropY: number = 0, // Where to start slicing Y
+  cropHeight: number | null = null, // How tall the slice is
 ): Float32Array {
-  // 1. Initialize the Target Buffer
-  // Size: 640 * 640 * 3 channels (R, G, B)
+  const actualCropHeight = cropHeight ?? srcHeight;
+
+  // 1. Target Buffer (640x640 RGB)
   const float32Tensor = new Float32Array(modelSize * modelSize * 3);
+  float32Tensor.fill(114.0 / 255.0); // Padding color (standard YOLO gray)
 
-  // 2. Fill the ENTIRE buffer with the "Grey" padding color first
-  // YOLO typically uses 114/255.0 as the neutral padding color
-  const paddingColor = 114.0 / 255.0;
-  float32Tensor.fill(paddingColor);
-
-  // 3. Calculate Padding Offsets
-  // We want to center the 307x640 image inside the 640x640 box
-  // Scale is usually 1 if you already resized it using 'contain'
-  const scale = Math.min(modelSize / srcWidth, modelSize / srcHeight);
+  // 2. Calculate Scale based on the CROP
+  const scale = Math.min(modelSize / srcWidth, modelSize / actualCropHeight);
 
   const newW = Math.round(srcWidth * scale);
-  const newH = Math.round(srcHeight * scale);
+  const newH = Math.round(actualCropHeight * scale);
 
-  // Calculate where the image should start (the "gap")
   const padX = Math.floor((modelSize - newW) / 2);
   const padY = Math.floor((modelSize - newH) / 2);
 
-  // 4. Copy Pixels Row by Row
-  // Validate source buffer length to prevent out-of-bounds reads which produce NaNs
-  const expectedLen = srcWidth * srcHeight * srcChannels;
-  if (sourcePixels.length < expectedLen) {
-    throw new Error(
-      `sourcePixels length ${sourcePixels.length} is smaller than expected ${expectedLen}`,
-    );
-  }
-
+  // 3. Copy Pixels
   for (let y = 0; y < newH; y++) {
     for (let x = 0; x < newW; x++) {
-      // Calculate index in the SOURCE array (the 307x640 image)
-      // (y * width + x) * 3 channels
-      const srcIdx = (y * srcWidth + x) * srcChannels;
+      // MAPPING LOGIC:
+      // Map target pixel (x,y) back to source pixel (srcX, srcY)
+      const srcXraw = Math.floor(x / scale);
+      const srcYraw = Math.floor(y / scale) + cropY;
 
-      // Calculate index in the TARGET tensor (the 640x640 box)
-      // Note we add padY to y, and padX to x
+      // SAFETY CHECK: Clamp coordinates to valid image bounds
+      // This prevents "index out of range" errors if rounding is slightly off
+      const safeX = Math.min(Math.max(srcXraw, 0), srcWidth - 1);
+      const safeY = Math.min(Math.max(srcYraw, 0), srcHeight - 1);
+
+      // Calculate index in the source array
+      // We rely on srcChannels=4 here to step through the buffer correctly
+      const srcIdx = (safeY * srcWidth + safeX) * srcChannels;
       const targetIdx = ((y + padY) * modelSize + (x + padX)) * 3;
 
-      // Normalize (0-255 -> 0.0-1.0) and Copy. Support RGBA by ignoring alpha.
-      float32Tensor[targetIdx] = sourcePixels[srcIdx] / 255.0;
-      float32Tensor[targetIdx + 1] = sourcePixels[srcIdx + 1] / 255.0;
-      float32Tensor[targetIdx + 2] = sourcePixels[srcIdx + 2] / 255.0;
+      // READ RAW PIXELS
+      const p1 = sourcePixels[srcIdx]; // Channel 1
+      const p2 = sourcePixels[srcIdx + 1]; // Channel 2
+      const p3 = sourcePixels[srcIdx + 2]; // Channel 3
+
+      // --- THE FIX: ROBUST GRAYSCALE ---
+      // We take the MAX of the channels.
+      // - If background is Green (0, 255, 0), max is 255 (White).
+      // - If background is White (255, 255, 255), max is 255 (White).
+      // - If text is Black (30, 30, 30), max is 30 (Dark Gray).
+      // This standardizes the input so the model sees black text on white background.
+      const maxVal = Math.max(p1, p2, p3);
+      const normalized = maxVal / 255.0;
+
+      // Fill R, G, B with the same grayscale value
+      float32Tensor[targetIdx] = normalized;
+      float32Tensor[targetIdx + 1] = normalized;
+      float32Tensor[targetIdx + 2] = normalized;
     }
   }
 
@@ -297,45 +307,114 @@ type DetectedObject = {
 };
 
 export async function locatePaymentFields(
-  resizedImagePath: string,
+  originalImagePath: string, // MUST be the high-res image (not 640x640)
   model: TensorflowModel,
-  currentWidth: number,
-  currentHeight: number,
+  // remove currentWidth/Height args -> we should trust the decoder
 ): Promise<DetectedObject[]> {
-  // save resized image for debugging
-  await CameraRoll.saveAsset(resizedImagePath, { type: "photo" });
+  // 1. Get raw bytes from the High-Res image
+  let pixels: Uint8Array;
+  let srcWidth: number;
+  let srcHeight: number;
+  let srcChannels: number;
 
-  // Image is already resized to 640x640 by resize plugin
-  const resizedImageUri = resizedImagePath.startsWith("file://")
-    ? resizedImagePath
-    : `file://${resizedImagePath}`;
-
-  // 1. Get raw bytes from resized image
-  let float32: Float32Array;
   try {
-    const decoded = await getRawBytes(resizedImageUri);
-    const srcWidth = decoded.width || currentWidth;
-    const srcHeight = decoded.height || currentHeight;
-    const srcChannels = decoded.channels || 3;
-
-    float32 = letterboxImage(decoded.pixels, srcWidth, srcHeight, srcChannels);
+    const decoded = await getRawBytes(originalImagePath);
+    pixels = decoded.pixels;
+    srcWidth = decoded.width;
+    srcHeight = decoded.height;
+    srcChannels = decoded.channels || 3;
   } catch (err) {
-    console.error("Preparing tensor failed; aborting inference", err);
+    console.error("Image decoding failed", err);
     return [];
   }
 
-  const outputs = await model.run([float32]);
+  // Configuration: 20% Overlap between tiles
+  const OVERLAP = 0.2;
 
-  const data = outputs[0] as Float32Array;
+  // Define Split Points
+  // Tile 1 Height: 60% of image
+  const topTileHeight = Math.floor(srcHeight * (0.5 + OVERLAP / 2));
 
-  const detections = getFinalCandidates(data, 307, 640);
+  // Tile 2 Start Y: 40% of image
+  const bottomTileY = Math.floor(srcHeight * (0.5 - OVERLAP / 2));
+  const bottomTileHeight = srcHeight - bottomTileY;
 
+  // ---------------------------------------------------------
+  // PASS 1: TOP TILE (0 to ~60%)
+  // ---------------------------------------------------------
+  const tensorTop = letterboxImage(
+    pixels,
+    srcWidth,
+    srcHeight,
+    srcChannels,
+    640,
+    0, // cropY
+    topTileHeight, // cropHeight
+  );
+
+  const outputTop = await model.run([tensorTop]);
+
+  // CRITICAL: Tell the parser we processed an image of size [srcWidth x topTileHeight]
+  // This ensures the bounding boxes are un-letterboxed relative to this tile.
+  const detsTop = getFinalCandidates(
+    outputTop[0] as Float32Array,
+    srcWidth,
+    topTileHeight,
+  );
+
+  // ---------------------------------------------------------
+  // PASS 2: BOTTOM TILE (~40% to 100%)
+  // ---------------------------------------------------------
+  const tensorBottom = letterboxImage(
+    pixels,
+    srcWidth,
+    srcHeight,
+    srcChannels,
+    640,
+    bottomTileY, // cropY
+    bottomTileHeight, // cropHeight
+  );
+
+  const outputBottom = await model.run([tensorBottom]);
+
+  const detsBottom = getFinalCandidates(
+    outputBottom[0] as Float32Array,
+    srcWidth,
+    bottomTileHeight,
+    0.4,
+  );
+
+  // ---------------------------------------------------------
+  // MERGE & NMS
+  // ---------------------------------------------------------
+
+  // 1. Adjust Bottom Detections
+  // The model returned Y coords relative to the cut. Add the global offset.
+  const detsBottomAdjusted = detsBottom.map((d) => ({
+    ...d,
+    box: {
+      ...d.box,
+      y: d.box.y + bottomTileY,
+    },
+  }));
+
+  // 2. Combine
+  const allCandidates = [...detsTop, ...detsBottomAdjusted];
+
+  // 3. Final NMS (Removes duplicates in the overlap zone)
+  // If "Amount" is detected in both tiles, the one with higher confidence wins.
+  const finalDetections = nonMaxSuppression(allCandidates, 0.5);
+
+  // ---------------------------------------------------------
+  // CROP & OCR PREP
+  // ---------------------------------------------------------
   const detectedObjects: DetectedObject[] = [];
 
-  for (const det of detections) {
+  for (const det of finalDetections) {
+    // Note: cropObject must handle the FULL High-Res image URI
     const croppedObject = await cropObject(
-      "transactionId",
-      resizedImageUri,
+      "transaction_field",
+      originalImagePath,
       det,
     );
 
