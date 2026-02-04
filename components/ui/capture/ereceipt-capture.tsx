@@ -1,12 +1,21 @@
 import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import { CameraScreen } from "@/components/camera-screen";
+import { UntreatedPayment } from "@/types/payment";
 import { extractText, locatePaymentFields } from "@/utils/photoProcessor";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import { RouteProp } from "@react-navigation/native";
-import { useState } from "react";
-import { PermissionsAndroid, Platform } from "react-native";
+import { RouteProp, useNavigation } from "@react-navigation/native";
+import { useLayoutEffect, useState } from "react";
+import {
+  PermissionsAndroid,
+  Platform,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useTensorflowModel } from "react-native-fast-tflite";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PhotoFile } from "react-native-vision-camera";
+import { ProcessingScreen } from "./processing-screen";
 
 const YOLO_MODEL = require("../../../assets/models/yolo.tflite");
 
@@ -42,9 +51,19 @@ export default function EReceiptCapture({
 }: {
   route: RouteProp<CaptureStackParamList, "EReceiptCapture">;
 }) {
+  const navigation = useNavigation();
   const { selectedProducts } = route.params;
   const { totalAmount } = route.params;
+  const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<UntreatedPayment | null>(
+    null,
+  );
+
+  // get device height and width
+  const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
   const [capturedPhoto, setCapturedPhoto] = useState<PhotoFile | null>(null);
 
   const plugin = useTensorflowModel(YOLO_MODEL, "android-gpu");
@@ -57,20 +76,13 @@ export default function EReceiptCapture({
         return;
       }
 
-      console.log("Starting detection...");
-
-      // 1. Resize photo to exactly 640x640 using ImageResizer (resize plugin works with Frames, not PhotoFiles)
-      // const resizedPhoto = await ImageResizer.createResizedImage(
-      //   `file://${photo.path}`,
-      //   640,
-      //   640,
-      //   "JPEG",
-      //   100,
-      //   0,
-      //   undefined,
-      //   false,
-      //   { mode: "contain", onlyScaleDown: false },
-      // );
+      const paymentDetails: UntreatedPayment = {
+        name: null,
+        date: null,
+        accountNumber: "",
+        amount: "",
+        referenceNumber: "",
+      };
 
       const detectedObjects = await locatePaymentFields(
         `file://${photo.path}`,
@@ -80,20 +92,101 @@ export default function EReceiptCapture({
       for (const obj of detectedObjects) {
         const text = await extractText(obj.croppedPath);
 
-        console.log(text);
+        console.log(`Detected class ${obj.classId} with text: ${text}`);
+
+        switch (obj.classId) {
+          case 0:
+            paymentDetails.accountNumber = text;
+            break;
+          case 1:
+            paymentDetails.name = text;
+            break;
+          case 2:
+            paymentDetails.referenceNumber = text;
+            break;
+          case 3:
+            paymentDetails.amount = text;
+            break;
+          case 4:
+            paymentDetails.date = text;
+            break;
+        }
       }
-    } catch (err) {
-      console.error("Error during model inference:", err);
+
+      if (
+        paymentDetails.amount === "" ||
+        paymentDetails.referenceNumber === ""
+      ) {
+        throw new Error("Essential payment details missing");
+      }
+
+      // setPaymentDetails(paymentDetails);
+      // const paymentDetails = {};
+
+      // Processing complete, show results or next steps
+      navigation.navigate({
+        name: "ReviewPayment",
+        params: {
+          selectedProducts: selectedProducts,
+          totalAmount: totalAmount,
+          paymentDetails: paymentDetails,
+        },
+      } as never);
+    } catch {
+      navigation.navigate({
+        name: "ErrorScanning",
+        params: {
+          message: "Error scanning e-receipt. Please try again.",
+          selectedProducts,
+          totalAmount,
+        },
+      } as never);
     }
   };
 
+  useLayoutEffect(() => {
+    navigation.setOptions?.({ headerShown: false });
+
+    // hide any parent tab bars (handles nested tab navigators)
+    const parents = [] as any[];
+    let p = navigation.getParent?.();
+    while (p) {
+      parents.push(p);
+      p = p.getParent?.();
+    }
+    parents.forEach((par) =>
+      par.setOptions?.({ tabBarStyle: { display: "none", height: 0 } }),
+    );
+
+    return () => {
+      // restore header and tab bar style
+      navigation.setOptions?.({ headerShown: undefined });
+      parents.forEach((par) => par.setOptions?.({ tabBarStyle: undefined }));
+    };
+  }, [navigation]);
+
+  if (capturedPhoto && isProcessing) {
+    return <ProcessingScreen />;
+  }
+
   return (
-    <CameraScreen
-      hasPermission={hasPermission}
-      setHasPermission={setHasPermission}
-      capturedPhoto={capturedPhoto}
-      setCapturedPhoto={setCapturedPhoto}
-      processPhoto={processPhoto}
-    ></CameraScreen>
+    <View style={[styles.container, { marginBottom: -insets.bottom }]}>
+      <CameraScreen
+        hasPermission={hasPermission}
+        setHasPermission={setHasPermission}
+        capturedPhoto={capturedPhoto}
+        setCapturedPhoto={setCapturedPhoto}
+        processPhoto={processPhoto}
+        setIsProcessing={setIsProcessing}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 9999,
+    backgroundColor: "black",
+  },
+});

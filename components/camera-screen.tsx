@@ -1,13 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  Dimensions,
-  Image,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   Camera,
   PhotoFile,
@@ -21,6 +13,7 @@ type Props = {
   capturedPhoto: PhotoFile | null;
   setCapturedPhoto: (photo: PhotoFile | null) => void;
   processPhoto: (photo: PhotoFile) => Promise<void>;
+  setIsProcessing: (processing: boolean) => void;
 };
 
 export function CameraScreen({
@@ -29,11 +22,12 @@ export function CameraScreen({
   capturedPhoto,
   setCapturedPhoto,
   processPhoto,
+  setIsProcessing,
 }: Props) {
   const device = useCameraDevice("back");
   const camera = useRef<Camera>(null);
 
-  const { width, height } = Dimensions.get("window");
+  // use parent sizing; let the camera fill its container
 
   const format = useCameraFormat(device, [
     { videoResolution: { width: 640, height: 480 } },
@@ -57,31 +51,14 @@ export function CameraScreen({
 
     setCapturedPhoto(photo);
 
+    setIsProcessing(true);
+
     await processPhoto(photo);
+
+    setIsProcessing(false);
   };
 
   if (!device) return <Text>Loading Device...</Text>;
-
-  if (capturedPhoto) {
-    // console.log("Captured");
-    return (
-      <Modal visible animationType="slide">
-        <View style={[styles.container, { width, height }]}>
-          <Image
-            source={{ uri: `file://${capturedPhoto.path}` }}
-            style={{ width, height }}
-            resizeMode="cover"
-          />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setCapturedPhoto(null)}
-          >
-            <Text style={styles.text}>Retake</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    );
-  }
 
   if (!hasPermission) {
     console.log("No camera permission");
@@ -89,32 +66,28 @@ export function CameraScreen({
   }
 
   return (
-    <Modal visible animationType="slide">
-      <View style={[styles.container, { width, height }]}>
-        <Camera
-          ref={camera}
-          style={{ width, height }}
-          device={device}
-          isActive={true}
-          format={format}
-          photo={true}
-        />
+    <View style={styles.container}>
+      <Camera
+        ref={camera}
+        style={StyleSheet.absoluteFillObject}
+        device={device}
+        isActive={true}
+        format={format ?? undefined}
+        photo={true}
+      />
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.captureButton]} onPress={onCapture}>
-            <View style={styles.captureInner} />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={[styles.captureButton]} onPress={onCapture}>
+          <View style={styles.captureInner} />
+        </TouchableOpacity>
       </View>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    top: 0,
-    left: 0,
+    ...StyleSheet.absoluteFillObject,
     zIndex: 9999,
   },
   buttonContainer: {
