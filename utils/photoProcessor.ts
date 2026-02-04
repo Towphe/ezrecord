@@ -1,4 +1,3 @@
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import ImageEditor from "@react-native-community/image-editor";
 import TextRecognition from "@react-native-ml-kit/text-recognition";
 import { decode } from "base64-arraybuffer";
@@ -339,9 +338,7 @@ export async function locatePaymentFields(
   const bottomTileY = Math.floor(srcHeight * (0.5 - OVERLAP / 2));
   const bottomTileHeight = srcHeight - bottomTileY;
 
-  // ---------------------------------------------------------
   // PASS 1: TOP TILE (0 to ~60%)
-  // ---------------------------------------------------------
   const tensorTop = letterboxImage(
     pixels,
     srcWidth,
@@ -354,17 +351,14 @@ export async function locatePaymentFields(
 
   const outputTop = await model.run([tensorTop]);
 
-  // CRITICAL: Tell the parser we processed an image of size [srcWidth x topTileHeight]
-  // This ensures the bounding boxes are un-letterboxed relative to this tile.
+  // tell the parser we processed an image of size [srcWidth x topTileHeight]
   const detsTop = getFinalCandidates(
     outputTop[0] as Float32Array,
     srcWidth,
     topTileHeight,
   );
 
-  // ---------------------------------------------------------
   // PASS 2: BOTTOM TILE (~40% to 100%)
-  // ---------------------------------------------------------
   const tensorBottom = letterboxImage(
     pixels,
     srcWidth,
@@ -383,10 +377,6 @@ export async function locatePaymentFields(
     bottomTileHeight,
     0.4,
   );
-
-  // ---------------------------------------------------------
-  // MERGE & NMS
-  // ---------------------------------------------------------
 
   // 1. Adjust Bottom Detections
   // The model returned Y coords relative to the cut. Add the global offset.
@@ -440,7 +430,7 @@ export async function cropObject(
   imagePath: string,
   detection: Detection,
 ) {
-  const { box, classIndex, score } = detection;
+  const { box } = detection;
 
   const cropData = {
     offset: {
@@ -452,10 +442,6 @@ export async function cropObject(
       height: box.height,
     },
   };
-
-  console.log(
-    `Cropping box at [${cropData.offset.x}, ${cropData.offset.y}] with size [${cropData.size.width}x${cropData.size.height}]`,
-  );
 
   try {
     // 2. Ensure a proper file URI
@@ -470,20 +456,13 @@ export async function cropObject(
     const croppedUri =
       typeof croppedResult === "string" ? croppedResult : croppedResult.uri;
 
-    // 5. Normalize URI and save to gallery
+    // 5. Normalize URI
     const normalizedCroppedUri = croppedUri.startsWith("file://")
       ? croppedUri
       : `file://${croppedUri}`;
 
-    await CameraRoll.saveAsset(normalizedCroppedUri, { type: "photo" });
-
-    console.log(
-      `Saved cropped image (classId: ${classIndex}, conf: ${score.toFixed(3)})`,
-    );
-
     return { normalizedCroppedUri, ...croppedResult };
   } catch (err) {
-    console.error("Crop/Save failed", err);
     return null;
   }
 }
