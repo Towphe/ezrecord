@@ -1,9 +1,9 @@
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { v4 as uuid } from "uuid";
+import * as Crypto from "expo-crypto";
 
 export const user = sqliteTable("user", {
   userId: text("user_id")
-    .$defaultFn(() => uuid())
+    .$defaultFn(() => Crypto.randomUUID())
     .primaryKey(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
@@ -19,7 +19,7 @@ export const user = sqliteTable("user", {
 
 export const product = sqliteTable("product", {
   productId: text("product_id")
-    .$defaultFn(() => uuid())
+    .$defaultFn(() => Crypto.randomUUID())
     .primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
@@ -36,7 +36,7 @@ export const product = sqliteTable("product", {
 
 export const transaction = sqliteTable("transaction", {
   transactionId: text("transaction_id")
-    .$defaultFn(() => uuid())
+    .$defaultFn(() => Crypto.randomUUID())
     .primaryKey(),
   totalAmount: real("total_amount").notNull(),
   paymentMethod: text("payment_method").notNull(),
@@ -52,7 +52,7 @@ export const transaction = sqliteTable("transaction", {
 
 export const transactionProduct = sqliteTable("transaction_product", {
   transactionProductId: text("transaction_product_id")
-    .$defaultFn(() => uuid())
+    .$defaultFn(() => Crypto.randomUUID())
     .primaryKey(),
   transactionId: text("transaction_id")
     .notNull()
