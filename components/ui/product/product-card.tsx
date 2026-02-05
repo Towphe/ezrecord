@@ -5,7 +5,6 @@ import { Product } from "@/types/products";
 import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { Modal, Pressable, StyleSheet } from "react-native";
-import { IconSymbol } from "../icon-symbol";
 import { DeleteProductModal } from "./delete-modal";
 
 export function ProductCard({
@@ -36,14 +35,11 @@ export function ProductCard({
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <Pressable onPress={() => setModalVisible(true)} style={styles.container}>
       <ThemedView style={styles.header}>
         <ThemedText style={styles.productName}>{name}</ThemedText>
         <ThemedView style={styles.actionButtonGroup}>
-          <ThemedText style={styles.price}>₱ {price}</ThemedText>
-          <Pressable onPress={() => setModalVisible(true)}>
-            <IconSymbol name="ellipsis" size={32} color="#333" />
-          </Pressable>
+          <ThemedText style={styles.price}>₱ {price.toFixed(2)}</ThemedText>
           <Modal
             animationType="none"
             transparent={true}
@@ -74,7 +70,7 @@ export function ProductCard({
       <ThemedView>
         <ThemedText style={styles.quantity}>Quantity: {quantity}</ThemedText>
       </ThemedView>
-    </ThemedView>
+    </Pressable>
   );
 }
 
