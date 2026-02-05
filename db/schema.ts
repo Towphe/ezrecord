@@ -40,6 +40,7 @@ export const transaction = sqliteTable("transaction", {
     .primaryKey(),
   totalAmount: real("total_amount").notNull(),
   paymentMethod: text("payment_method").notNull(),
+  referenceNumber: text("reference_number"),
   isDeleted: integer("is_deleted").notNull().default(0),
   createdAt: text("created_at")
     .notNull()
