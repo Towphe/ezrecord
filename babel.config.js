@@ -15,6 +15,7 @@ module.exports = function (api) {
         },
         "react-native-worklets-core/plugin",
       ],
+      ["inline-import", { extensions: [".sql"] }],
     ],
   };
 };
