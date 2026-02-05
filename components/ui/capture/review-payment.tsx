@@ -2,6 +2,7 @@ import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import { InputField } from "@/components/input-field";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
+import { useCreateTransaction } from "@/hooks/create-transaction";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState } from "react";
@@ -26,6 +27,8 @@ export default function ReviewPayment({
   route: RouteProp<CaptureStackParamList, "ReviewPayment">;
 }) {
   const navigation = useNavigation();
+  const { createTransaction } = useCreateTransaction();
+
   const { selectedProducts, totalAmount, paymentDetails } = route.params;
   const [isEditing, setIsEditing] = useState(false);
 
@@ -52,8 +55,25 @@ export default function ReviewPayment({
     } as never);
   };
 
-  const confirmPayment = () => {
-    // TODO: create transaction and update inventory
+  const confirmPayment = async (data: z.infer<typeof schema>) => {
+    if (data.amount < totalAmount) {
+      // TODO: apply error handling (disable confirm button and show error message)
+      console.log(
+        `Amount ${data.amount} does not match total amount ${totalAmount}`,
+      );
+      return;
+    }
+
+    await createTransaction({
+      selectedProducts: selectedProducts,
+      totalAmount: totalAmount,
+      paymentMethod: "epayment",
+      paymentInfo: {
+        name: null,
+        accountNumber: null,
+        ...data,
+      },
+    });
 
     navigation.navigate("CaptureHome" as never);
   };
@@ -61,7 +81,6 @@ export default function ReviewPayment({
   const {
     control,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
@@ -102,36 +121,6 @@ export default function ReviewPayment({
       </KeyboardAvoidingView>
     </ParallaxScrollView>
   );
-
-  // return (
-  //   <ParallaxScrollView title="Capture">
-  //     <ThemedView style={styles.page}>
-  //       {/* <ThemedView style={styles.productsContainer}>
-  //         {selectedProducts.map((product) => (
-  //           <ProductItem key={product.productId} {...product} />
-  //         ))}
-  //       </ThemedView> */}
-  //       <ThemedView>
-  //         {/* <ThemedText>Name: {paymentDetails.name}</ThemedText> */}
-  //         {paymentDetails.name && (
-  //           <ThemedText>Name: {paymentDetails.name}</ThemedText>
-  //         )}
-  //         <ThemedText>Amount: {paymentDetails.amount}</ThemedText>
-  //         <ThemedText>
-  //           Reference Number: {paymentDetails.referenceNumber}
-  //         </ThemedText>
-  //       </ThemedView>
-  //       <ThemedView style={styles.actionContainer}>
-  // <Button title="Rescan" color="teal" onPress={redirectToScan} />
-  // <Button
-  //   title="Confirm Payment"
-  //   color="green"
-  //   onPress={confirmPayment}
-  // />
-  //       </ThemedView>
-  //     </ThemedView>
-  //   </ParallaxScrollView>
-  // );
 }
 
 const styles = StyleSheet.create({
