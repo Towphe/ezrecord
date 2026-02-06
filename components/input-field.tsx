@@ -13,6 +13,7 @@ type InputFieldProps = {
   labelStyle?: object;
   inputStyle?: object;
   defaultValue?: any;
+  disabled?: boolean;
 };
 
 export function InputField({
@@ -25,21 +26,22 @@ export function InputField({
   labelStyle,
   inputStyle,
   defaultValue,
+  disabled = false,
 }: InputFieldProps) {
   return (
     <ThemedView style={[containerStyle]}>
       {label && <ThemedText style={labelStyle}>{label}</ThemedText>}
       <Controller
         control={control}
-        name={fieldName}
         defaultValue={defaultValue}
+        name={fieldName}
         render={({ field: { onChange, onBlur, value } }) => {
-          const displayValue = value == null ? "" : String(value);
           return (
             <TextInput
               style={inputStyle}
               placeholder={placeholder}
               onBlur={onBlur}
+              value={value === undefined || value === null ? "" : String(value)}
               onChangeText={(text) =>
                 onChange(
                   fieldType === "number"
@@ -49,7 +51,7 @@ export function InputField({
                     : text,
                 )
               }
-              value={displayValue}
+              editable={!disabled}
               autoCapitalize={fieldType === "number" ? "none" : "words"}
               keyboardType={fieldType === "number" ? "numeric" : "default"}
             />
