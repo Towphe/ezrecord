@@ -45,7 +45,7 @@ export default function ReviewPayment({
     return () => {};
   }, [navigation]);
 
-  const redirectToScan = () => {
+  const redirectToScan = async () => {
     navigation.navigate({
       name: "EReceiptCapture",
       params: {
@@ -56,7 +56,7 @@ export default function ReviewPayment({
   };
 
   const confirmPayment = async (data: z.infer<typeof schema>) => {
-    if (data.amount < totalAmount) {
+    if (data.amount === null || data.amount < totalAmount) {
       // TODO: apply error handling (disable confirm button and show error message)
       console.log(
         `Amount ${data.amount} does not match total amount ${totalAmount}`,
@@ -68,11 +68,7 @@ export default function ReviewPayment({
       selectedProducts: selectedProducts,
       totalAmount: totalAmount,
       paymentMethod: "epayment",
-      paymentInfo: {
-        name: null,
-        accountNumber: null,
-        ...data,
-      },
+      paymentInfo: data,
     });
 
     navigation.navigate("CaptureHome" as never);
@@ -97,6 +93,7 @@ export default function ReviewPayment({
           fieldName="amount"
           label="Amount"
           control={control}
+          defaultValue={paymentDetails.amount}
           placeholder="Amount"
           disabled={!isEditing}
         />
@@ -106,7 +103,7 @@ export default function ReviewPayment({
           label="Reference Number"
           control={control}
           placeholder="Reference Number"
-          defaultValue={paymentDetails.referenceNumber ?? undefined}
+          defaultValue={paymentDetails.referenceNumber}
           disabled={!isEditing}
         />
         {errors.referenceNumber && (
@@ -117,7 +114,7 @@ export default function ReviewPayment({
           color="green"
           onPress={handleSubmit(confirmPayment)}
         />
-        <Button title="Rescan" color="teal" onPress={redirectToScan} />
+        <Button title="Rescan" color="teal" onPress={() => redirectToScan()} />
       </KeyboardAvoidingView>
     </ParallaxScrollView>
   );
