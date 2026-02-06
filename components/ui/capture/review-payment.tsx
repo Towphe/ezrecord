@@ -68,7 +68,12 @@ export default function ReviewPayment({
       selectedProducts: selectedProducts,
       totalAmount: totalAmount,
       paymentMethod: "epayment",
-      paymentInfo: data,
+      paymentInfo: {
+        name: null,
+        accountNumber: null,
+        referenceNumber: data.referenceNumber,
+        amount: data.amount,
+      },
     });
 
     navigation.navigate("CaptureHome" as never);
