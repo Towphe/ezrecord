@@ -4,6 +4,6 @@ export type Transaction = {
   paymentMethod: string;
   referenceNumber: string | null;
   isDeleted: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
