@@ -303,6 +303,7 @@ export async function extractText(imagePath: string): Promise<string> {
 type DetectedObject = {
   classId: number;
   croppedPath: string;
+  confidence: number;
 };
 
 export async function locatePaymentFields(
@@ -416,9 +417,23 @@ export async function locatePaymentFields(
       croppedObject.height,
     );
 
+    const existingObject = detectedObjects.find(
+      (obj) => obj.classId === det.classIndex,
+    );
+
+    // If we already have a detection for this class, only keep the one with higher confidence
+    if (existingObject) {
+      if (det.score > existingObject.confidence) {
+        existingObject.croppedPath = finalPath;
+        existingObject.confidence = det.score;
+      }
+      continue; // Skip adding a new entry since we already have one for this class
+    }
+
     detectedObjects.push({
       classId: det.classIndex,
       croppedPath: finalPath,
+      confidence: det.score,
     });
   }
 
