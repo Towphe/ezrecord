@@ -14,14 +14,14 @@ import { IconSymbol } from "../icon-symbol";
 import { ProductCard } from "./product-card";
 import { SearchProduct } from "./search-product";
 
-function CreateButton({
-  handleCreatePress,
-}: {
+type CreateButtonProps = {
   handleCreatePress: () => void;
-}) {
+};
+
+function CreateButton({ handleCreatePress }: CreateButtonProps) {
   return (
     <Pressable style={{ marginTop: 36 }} onPress={handleCreatePress}>
-      <IconSymbol name="plus" size={24} color="#F2F2F2" />
+      <IconSymbol name="plus.circle" size={24} color="#F2F2F2" />
     </Pressable>
   );
 }
