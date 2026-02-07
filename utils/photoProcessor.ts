@@ -1,6 +1,8 @@
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import ImageEditor from "@react-native-community/image-editor";
 import TextRecognition from "@react-native-ml-kit/text-recognition";
 import { decode } from "base64-arraybuffer";
+import * as Crypto from "expo-crypto";
 import jpeg from "jpeg-js";
 import { TensorflowModel } from "react-native-fast-tflite";
 import RNFS from "react-native-fs";
@@ -306,11 +308,25 @@ type DetectedObject = {
   confidence: number;
 };
 
+type LocateFieldsResult = {
+  transactionId: string;
+  detectedObjects: DetectedObject[];
+};
+
 export async function locatePaymentFields(
   originalImagePath: string, // MUST be the high-res image (not 640x640)
   model: TensorflowModel,
   // remove currentWidth/Height args -> we should trust the decoder
-): Promise<DetectedObject[]> {
+): Promise<LocateFieldsResult> {
+  const transactionId = Crypto.randomUUID();
+
+  // rename the file to include transactionId for better debugging and organization
+  const newImagePath = `${RNFS.DocumentDirectoryPath}/${transactionId}_original.jpg`;
+  await RNFS.copyFile(originalImagePath, newImagePath);
+
+  // delete the original high-res image to save space, since we now have a copy with a transactionId in the name
+  await RNFS.unlink(originalImagePath);
+
   // 1. Get raw bytes from the High-Res image
   let pixels: Uint8Array;
   let srcWidth: number;
@@ -318,14 +334,14 @@ export async function locatePaymentFields(
   let srcChannels: number;
 
   try {
-    const decoded = await getRawBytes(originalImagePath);
+    const decoded = await getRawBytes(newImagePath);
     pixels = decoded.pixels;
     srcWidth = decoded.width;
     srcHeight = decoded.height;
     srcChannels = decoded.channels || 3;
   } catch (err) {
     console.error("Image decoding failed", err);
-    return [];
+    return { detectedObjects: [], transactionId: "" };
   }
 
   // Configuration: 20% Overlap between tiles
@@ -405,7 +421,7 @@ export async function locatePaymentFields(
     // Note: cropObject must handle the FULL High-Res image URI
     const croppedObject = await cropObject(
       "transaction_field",
-      originalImagePath,
+      newImagePath,
       det,
     );
 
@@ -437,7 +453,13 @@ export async function locatePaymentFields(
     });
   }
 
-  return detectedObjects;
+  // save original image and detected crops to a "transactionId" folder for debugging
+  CameraRoll.saveAsset(newImagePath, {
+    type: "photo",
+    album: `ezRecord`,
+  });
+
+  return { detectedObjects, transactionId };
 }
 
 export async function cropObject(

@@ -10,12 +10,19 @@ export function useCreateTransaction() {
   const drizzleDb = drizzle(db, { schema });
 
   const createTransaction = async (data: {
+    transactionId: string;
     selectedProducts: SelectedProduct[];
     totalAmount: number;
     paymentMethod: string;
     paymentInfo: Payment;
   }) => {
-    const { selectedProducts, paymentMethod, totalAmount, paymentInfo } = data;
+    const {
+      transactionId,
+      selectedProducts,
+      paymentMethod,
+      totalAmount,
+      paymentInfo,
+    } = data;
 
     // subtract product quantities from inventory
     for (const product of selectedProducts) {
@@ -49,6 +56,7 @@ export function useCreateTransaction() {
     const transactionResult = await drizzleDb
       .insert(schema.transaction)
       .values({
+        transactionId: transactionId,
         totalAmount: totalAmount,
         paymentMethod: paymentMethod,
         referenceNumber: paymentInfo.referenceNumber,

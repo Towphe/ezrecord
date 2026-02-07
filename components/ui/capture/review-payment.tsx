@@ -54,7 +54,8 @@ export default function ReviewPayment({
   const navigation = useNavigation();
   const { createTransaction } = useCreateTransaction();
 
-  const { selectedProducts, totalAmount, paymentDetails } = route.params;
+  const { selectedProducts, totalAmount, paymentDetails, transactionId } =
+    route.params;
   const [isEditing, setIsEditing] = useState(false);
 
   useLayoutEffect(() => {
@@ -91,6 +92,7 @@ export default function ReviewPayment({
     }
 
     await createTransaction({
+      transactionId: transactionId,
       selectedProducts: selectedProducts,
       totalAmount: totalAmount,
       paymentMethod: "epayment",

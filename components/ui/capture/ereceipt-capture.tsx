@@ -81,7 +81,7 @@ export default function EReceiptCapture({
         referenceNumber: "",
       };
 
-      const detectedObjects = await locatePaymentFields(
+      const { detectedObjects, transactionId } = await locatePaymentFields(
         `file://${photo.path}`,
         model,
       );
@@ -134,6 +134,7 @@ export default function EReceiptCapture({
       navigation.navigate({
         name: "ReviewPayment",
         params: {
+          transactionId,
           selectedProducts: selectedProducts,
           totalAmount: totalAmount,
           paymentDetails: treatedPayment,

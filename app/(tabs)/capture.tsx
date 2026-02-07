@@ -12,6 +12,7 @@ export type CaptureStackParamList = {
   ReviewOrder: { selectedProducts: SelectedProduct[] };
   EReceiptCapture: { selectedProducts: SelectedProduct[]; totalAmount: number };
   ReviewPayment: {
+    transactionId: string;
     selectedProducts: SelectedProduct[];
     totalAmount: number;
     paymentDetails: Payment;
