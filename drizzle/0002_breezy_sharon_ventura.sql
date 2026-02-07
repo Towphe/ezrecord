@@ -1,0 +1,1 @@
+ALTER TABLE `transaction` ADD `receipt_image_uri` text;
