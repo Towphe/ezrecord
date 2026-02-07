@@ -41,7 +41,7 @@ export function InputField({
               style={inputStyle}
               placeholder={placeholder}
               onBlur={onBlur}
-              value={value ?? ""}
+              value={value == null ? "" : String(value)}
               onChangeText={(text) =>
                 onChange(
                   fieldType === "number"
