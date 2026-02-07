@@ -7,16 +7,7 @@ import { useState } from "react";
 import { Modal, Pressable, StyleSheet } from "react-native";
 import { DeleteProductModal } from "./delete-modal";
 
-export function ProductCard({
-  productId,
-  name,
-  description,
-  quantity,
-  price,
-  isDeleted,
-  createdAt,
-  updatedAt,
-}: Product) {
+export function ProductCard({ productId, name, quantity, price }: Product) {
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [deletedModalVisible, setDeletedModalVisible] =

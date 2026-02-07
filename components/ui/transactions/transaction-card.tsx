@@ -11,7 +11,6 @@ export function TransactionCard({
 }: Transaction) {
   const navigation = useNavigation();
   const truncatedTransactionId = transactionId.substring(0, 8);
-  // const date = new Date(parseInt(createdAt));
 
   const handleViewPress = () =>
     navigation.navigate({

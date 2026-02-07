@@ -12,16 +12,7 @@ type Props = {
 };
 
 export function ProductCard({ product, onAdd, onSubtract }: Props) {
-  const {
-    productId,
-    name,
-    description,
-    quantity,
-    price,
-    isDeleted,
-    createdAt,
-    updatedAt,
-  }: Product = product;
+  const { name, quantity }: Product = product;
   const [selected, setSelected] = useState<number>(0);
 
   const increment = () => {
