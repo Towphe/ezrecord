@@ -41,7 +41,7 @@ export function InputField({
               style={inputStyle}
               placeholder={placeholder}
               onBlur={onBlur}
-              value={value === undefined || value === null ? "" : String(value)}
+              value={value ?? ""}
               onChangeText={(text) =>
                 onChange(
                   fieldType === "number"
@@ -51,6 +51,7 @@ export function InputField({
                     : text,
                 )
               }
+              placeholderTextColor="#999"
               editable={!disabled}
               autoCapitalize={fieldType === "number" ? "none" : "words"}
               keyboardType={fieldType === "number" ? "numeric" : "default"}
