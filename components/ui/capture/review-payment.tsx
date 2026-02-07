@@ -8,8 +8,14 @@ import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, KeyboardAvoidingView, StyleSheet } from "react-native";
+import {
+  Button,
+  KeyboardAvoidingView,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import * as z from "zod";
+import { IconSymbol } from "../icon-symbol";
 
 const schema = z.object({
   amount: z.coerce.number(),
@@ -20,6 +26,29 @@ function parseAmount(amount: string): number {
   // remove all non-numeric characters except for the decimal point
   const cleanedAmount = amount.replace(/[^0-9.]/g, "");
   return parseFloat(cleanedAmount);
+}
+
+function EditButton({
+  isEditing,
+  setIsEditing,
+}: {
+  isEditing: boolean;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  if (isEditing) {
+    return (
+      <Pressable style={{ marginTop: 36 }} onPress={() => setIsEditing(false)}>
+        {" "}
+        <IconSymbol name="stop" size={20} color="#F2F2F2" />
+      </Pressable>
+    );
+  }
+
+  return (
+    <Pressable style={{ marginTop: 36 }} onPress={() => setIsEditing(true)}>
+      <IconSymbol name="pencil" size={20} color="#F2F2F2" />;
+    </Pressable>
+  );
 }
 
 export default function ReviewPayment({
@@ -93,7 +122,12 @@ export default function ReviewPayment({
   });
 
   return (
-    <ParallaxScrollView title="Products">
+    <ParallaxScrollView
+      title="Products"
+      rightSibling={
+        <EditButton isEditing={isEditing} setIsEditing={setIsEditing} />
+      }
+    >
       <ThemedView style={{ flex: 1, justifyContent: "space-between" }}>
         <KeyboardAvoidingView style={styles.form} behavior="height">
           <InputField

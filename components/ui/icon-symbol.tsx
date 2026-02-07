@@ -27,6 +27,8 @@ const MAPPING = {
   "doc.plaintext": "receipt",
   subtract: "subtract",
   magnifyingglass: "search",
+  pencil: "edit",
+  stop: "cancel",
 } as unknown as IconMapping;
 
 /**
