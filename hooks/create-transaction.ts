@@ -9,7 +9,6 @@ export function useCreateTransaction() {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
 
-  // TODO: implement proper error handling
   const createTransaction = async (data: {
     selectedProducts: SelectedProduct[];
     totalAmount: number;
