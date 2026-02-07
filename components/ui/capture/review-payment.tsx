@@ -14,6 +14,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import * as z from "zod";
 import { IconSymbol } from "../icon-symbol";
 
@@ -87,10 +88,11 @@ export default function ReviewPayment({
 
   const confirmPayment = async (data: z.infer<typeof schema>) => {
     if (data.amount === null || data.amount < totalAmount) {
-      // TODO: apply error handling (disable confirm button and show error message)
-      console.log(
-        `Amount ${data.amount} does not match total amount ${totalAmount}`,
-      );
+      Toast.show({
+        type: "error",
+        text1: "Amount Mismatch",
+        text2: `The entered amount does not match the total amount of the products.`,
+      });
       return;
     }
 
