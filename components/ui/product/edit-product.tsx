@@ -2,6 +2,7 @@ import { ProductStackParamList } from "@/app/(tabs)/products";
 import { InputField } from "@/components/input-field";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useEditProduct } from "@/hooks/edit-product";
 import { useProduct } from "@/hooks/use-product";
@@ -99,54 +100,64 @@ export function EditProduct({
 
   return (
     <ParallaxScrollView title="Products">
-      <KeyboardAvoidingView style={styles.form} behavior="height">
-        <InputField
-          fieldName="name"
-          label="Name"
-          control={control}
-          placeholder="Product Name"
-          defaultValue={product?.name ?? undefined}
-        />
-        {errors.name && <ThemedText>{errors.name.message}</ThemedText>}
-        <InputField
-          fieldName="description"
-          label="Description"
-          control={control}
-          placeholder="Product Description"
-          defaultValue={product?.description ?? undefined}
-        />
-        {errors.description && (
-          <ThemedText>{errors.description.message}</ThemedText>
-        )}
-        <InputField
-          fieldName="price"
-          label="Price"
-          control={control}
-          placeholder="Product Price"
-          fieldType="number"
-          defaultValue={product?.price ?? undefined}
-        />
-        {errors.price && <ThemedText>{errors.price.message}</ThemedText>}
-        <InputField
-          fieldName="quantity"
-          label="Quantity"
-          control={control}
-          placeholder="Product Quantity"
-          fieldType="number"
-          defaultValue={product?.quantity ?? undefined}
-        />
-        {errors.quantity && <ThemedText>{errors.quantity.message}</ThemedText>}
-        <Button
-          title="Edit Product"
-          onPress={handleSubmit(onSubmit)}
-          color={Colors.yellow}
-        />
-        <Button
-          title="Cancel"
-          onPress={handleCancel}
-          color={Colors.dark.background}
-        />
-      </KeyboardAvoidingView>
+      <ThemedView style={{ flex: 1, justifyContent: "space-between" }}>
+        <KeyboardAvoidingView style={styles.form} behavior="height">
+          <InputField
+            fieldName="name"
+            label="Name"
+            control={control}
+            placeholder="Product Name"
+            defaultValue={product?.name ?? undefined}
+            inputStyle={styles.input}
+          />
+          {errors.name && <ThemedText>{errors.name.message}</ThemedText>}
+          <InputField
+            fieldName="description"
+            label="Description"
+            control={control}
+            placeholder="Product Description"
+            defaultValue={product?.description ?? undefined}
+            inputStyle={styles.input}
+          />
+          {errors.description && (
+            <ThemedText>{errors.description.message}</ThemedText>
+          )}
+          <InputField
+            fieldName="price"
+            label="Price"
+            control={control}
+            placeholder="Product Price"
+            fieldType="number"
+            defaultValue={product?.price ?? undefined}
+            inputStyle={styles.input}
+          />
+          {errors.price && <ThemedText>{errors.price.message}</ThemedText>}
+          <InputField
+            fieldName="quantity"
+            label="Quantity"
+            control={control}
+            placeholder="Product Quantity"
+            fieldType="number"
+            defaultValue={product?.quantity ?? undefined}
+            inputStyle={styles.input}
+          />
+          {errors.quantity && (
+            <ThemedText>{errors.quantity.message}</ThemedText>
+          )}
+        </KeyboardAvoidingView>
+        <ThemedView style={styles.actionButtons}>
+          <Button
+            title="Edit Product"
+            onPress={handleSubmit(onSubmit)}
+            color={Colors.yellow}
+          />
+          <Button
+            title="Cancel"
+            onPress={handleCancel}
+            color={Colors.dark.background}
+          />
+        </ThemedView>
+      </ThemedView>
     </ParallaxScrollView>
   );
 }
@@ -158,6 +169,19 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     gap: 15,
+    width: "95%",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 2,
+    fontSize: 16,
+  },
+  actionButtons: {
+    gap: 6,
+    marginHorizontal: "auto",
     width: "95%",
   },
 });
