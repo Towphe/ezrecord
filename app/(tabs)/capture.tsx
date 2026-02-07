@@ -3,7 +3,7 @@ import EReceiptCapture from "@/components/ui/capture/ereceipt-capture";
 import ErrorScanning from "@/components/ui/capture/error-scanning";
 import ReviewOrder from "@/components/ui/capture/review-order";
 import ReviewPayment from "@/components/ui/capture/review-payment";
-import { UntreatedPayment } from "@/types/payment";
+import { Payment } from "@/types/payment";
 import { SelectedProduct } from "@/types/product-selection";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -14,7 +14,7 @@ export type CaptureStackParamList = {
   ReviewPayment: {
     selectedProducts: SelectedProduct[];
     totalAmount: number;
-    paymentDetails: UntreatedPayment;
+    paymentDetails: Payment;
   };
   ErrorScanning: {
     selectedProducts: SelectedProduct[];

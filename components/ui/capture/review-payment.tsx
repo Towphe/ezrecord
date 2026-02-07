@@ -19,15 +19,9 @@ import * as z from "zod";
 import { IconSymbol } from "../icon-symbol";
 
 const schema = z.object({
-  amount: z.coerce.number(),
+  amount: z.number(),
   referenceNumber: z.string(),
 });
-
-function parseAmount(amount: string): number {
-  // remove all non-numeric characters except for the decimal point
-  const cleanedAmount = amount.replace(/[^0-9.]/g, "");
-  return parseFloat(cleanedAmount);
-}
 
 function EditButton({
   isEditing,
@@ -118,7 +112,7 @@ export default function ReviewPayment({
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      amount: parseAmount(paymentDetails.amount),
+      amount: paymentDetails.amount,
       referenceNumber: paymentDetails.referenceNumber,
     },
   });
@@ -135,6 +129,7 @@ export default function ReviewPayment({
           <InputField
             fieldName="amount"
             label="Amount"
+            fieldType="number"
             control={control}
             defaultValue={paymentDetails.amount}
             placeholder="Amount"

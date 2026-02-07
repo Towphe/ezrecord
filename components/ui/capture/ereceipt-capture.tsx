@@ -1,6 +1,6 @@
 import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import { CameraScreen } from "@/components/camera-screen";
-import { UntreatedPayment } from "@/types/payment";
+import { Payment, UntreatedPayment } from "@/types/payment";
 import { extractText, locatePaymentFields } from "@/utils/photoProcessor";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { RouteProp, useNavigation } from "@react-navigation/native";
@@ -56,9 +56,6 @@ export default function EReceiptCapture({
   const { totalAmount } = route.params;
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState<UntreatedPayment | null>(
-    null,
-  );
 
   // get device height and width
   const { height } = useWindowDimensions();
@@ -92,7 +89,9 @@ export default function EReceiptCapture({
       for (const obj of detectedObjects) {
         const text = await extractText(obj.croppedPath);
 
-        console.log(`Detected class ${obj.classId} with text: ${text}`);
+        console.log(
+          `Detected class ${obj.classId} with text: ${text} (confidence: ${obj.confidence})`,
+        );
 
         switch (obj.classId) {
           case 0:
@@ -120,8 +119,16 @@ export default function EReceiptCapture({
         throw new Error("Essential payment details missing");
       }
 
-      // setPaymentDetails(paymentDetails);
-      // const paymentDetails = {};
+      const treatedPayment: Payment = {
+        name: paymentDetails.name,
+        accountNumber: paymentDetails.accountNumber
+          ? paymentDetails.accountNumber
+          : null,
+        amount: parseFloat(paymentDetails.amount.replace(/[^0-9.-]+/g, "")),
+        referenceNumber: paymentDetails.referenceNumber,
+      };
+
+      console.log(treatedPayment);
 
       // Processing complete, show results or next steps
       navigation.navigate({
@@ -129,7 +136,7 @@ export default function EReceiptCapture({
         params: {
           selectedProducts: selectedProducts,
           totalAmount: totalAmount,
-          paymentDetails: paymentDetails,
+          paymentDetails: treatedPayment,
         },
       } as never);
     } catch {
