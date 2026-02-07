@@ -9,13 +9,13 @@ export function ProductItem({ name, quantity, unitPrice }: SelectedProduct) {
       <ThemedView style={styles.row}>
         <ThemedText style={styles.header}>{name}</ThemedText>
         <ThemedText style={styles.header}>
-          P {(quantity * unitPrice).toFixed(2)}
+          ₱ {(quantity * unitPrice).toFixed(2)}
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.row}>
         <ThemedText style={styles.subHeader}>Quantity: {quantity}</ThemedText>
         <ThemedText style={styles.subHeader}>
-          P {unitPrice.toFixed(2)} / pc
+          ₱ {unitPrice.toFixed(2)} / pc
         </ThemedText>
       </ThemedView>
     </ThemedView>
