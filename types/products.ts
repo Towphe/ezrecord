@@ -5,6 +5,6 @@ export type Product = {
   quantity: number;
   price: number;
   isDeleted: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 };

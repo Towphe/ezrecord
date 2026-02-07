@@ -5,13 +5,14 @@ import { ThemedView } from "@/components/themed-view";
 import { useProducts } from "@/hooks/use-products";
 import { SelectedProduct } from "@/types/product-selection";
 import { Product } from "@/types/products";
+import { RouteProp, useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 import {
-  RouteProp,
-  useFocusEffect,
-  useNavigation,
-} from "@react-navigation/native";
-import { useCallback, useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import { ProductCard } from "../capture/product-card";
 import { IconSymbol } from "../icon-symbol";
 import { SearchProduct } from "../product/search-product";
@@ -39,6 +40,7 @@ export default function CaptureHome({
 }) {
   const navigation = useNavigation();
   const { products, loading: productLoading, refetch } = useProducts();
+  const [name, setName] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
     route?.params?.selectedProducts ?? [],
   );
@@ -100,11 +102,10 @@ export default function CaptureHome({
     } as never);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch]),
-  );
+  const handleSearch = (name: string) => {
+    setName(name);
+    refetch({ name, limit: 10 });
+  };
 
   if (productLoading) {
     // TODO: Replace with proper loading indicator
@@ -126,22 +127,34 @@ export default function CaptureHome({
       }
     >
       <ThemedView style={styles.page}>
-        <ThemedView style={styles.productsContainer}>
-          {products.length === 0 && (
-            <ThemedText style={{ textAlign: "center" }}>
-              No products found.
-            </ThemedText>
-          )}
-          {products.map((product) => (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.productId}
+          renderItem={({ item }) => (
             <ProductCard
-              key={product.productId}
-              product={product}
+              product={item}
               onAdd={addProduct}
               onSubtract={subtractProduct}
             />
-          ))}
-        </ThemedView>
-        <SearchProduct onSearch={refetch} />
+          )}
+          onEndReached={() => {
+            const lastProduct = products[products.length - 1];
+
+            if (lastProduct) {
+              refetch({
+                name,
+                limit: 10,
+                after: lastProduct.createdAt,
+              });
+            }
+          }}
+          style={styles.productsContainer}
+          onEndReachedThreshold={0.2}
+          ListFooterComponent={() =>
+            productLoading ? <ActivityIndicator size="small" /> : null
+          }
+        />
+        <SearchProduct onSearch={handleSearch} />
       </ThemedView>
     </ParallaxScrollView>
   );
