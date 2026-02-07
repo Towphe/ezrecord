@@ -2,7 +2,8 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTransactions } from "@/hooks/use-transactions";
-import { useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
 import { SearchTransaction } from "./search-transaction";
 import { TransactionCard } from "./transaction-card";
@@ -20,6 +21,13 @@ export default function TransactionsHome() {
     setTransactionId(transactionId);
     refetchTransactions({ transactionId });
   };
+
+  // Refetch when the screen comes into focus so newly created transactions appear
+  useFocusEffect(
+    useCallback(() => {
+      refetchTransactions({ transactionId });
+    }, [refetchTransactions, transactionId]),
+  );
 
   if (transactionsLoading) {
     return (
