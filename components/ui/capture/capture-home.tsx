@@ -13,6 +13,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { ProductCard } from "../capture/product-card";
 import { IconSymbol } from "../icon-symbol";
 import { SearchProduct } from "../product/search-product";
@@ -46,20 +47,12 @@ export default function CaptureHome({
   );
 
   const addProduct = (product: Product) => {
-    setSelectedProducts((previousProducts) => {
-      const prevProduct = previousProducts.find(
-        (p) => p.productId === product.productId,
-      );
+    const selectedProduct = selectedProducts.find(
+      (p) => p.productId === product.productId,
+    );
 
-      if (prevProduct) {
-        return previousProducts.map((p) =>
-          p.productId === product.productId
-            ? { ...p, quantity: p.quantity + 1 }
-            : p,
-        );
-      }
-
-      return [
+    if (!selectedProduct) {
+      setSelectedProducts((previousProducts) => [
         ...previousProducts,
         {
           productId: product.productId,
@@ -67,11 +60,46 @@ export default function CaptureHome({
           unitPrice: product.price,
           name: product.name,
         },
-      ];
-    });
+      ]);
+
+      return true;
+    }
+
+    if (selectedProduct.quantity === product.quantity) {
+      Toast.show({
+        type: "error",
+        text1: "Product limit reached",
+        text2: "You have already added the maximum quantity of this product.",
+      });
+      return false;
+    }
+
+    setSelectedProducts((previousProducts) =>
+      previousProducts.map((p) =>
+        p.productId === product.productId
+          ? { ...p, quantity: p.quantity + 1 }
+          : p,
+      ),
+    );
+
+    return true;
   };
 
   const subtractProduct = (product: Product) => {
+    const selectedProduct = selectedProducts.find(
+      (p) => p.productId === product.productId,
+    );
+
+    if (!selectedProduct) {
+      Toast.show({
+        type: "error",
+        text1: "Product not selected",
+        text2: "You haven't added this product to the order.",
+      });
+
+      return false;
+    }
+
     setSelectedProducts((previousProducts) => {
       const prevProduct = previousProducts.find(
         (p) => p.productId === product.productId,
@@ -93,6 +121,8 @@ export default function CaptureHome({
 
       return previousProducts;
     });
+
+    return true;
   };
 
   const handleCheckout = () => {

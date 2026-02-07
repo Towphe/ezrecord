@@ -7,8 +7,8 @@ import { IconSymbol } from "../icon-symbol";
 
 type Props = {
   product: Product;
-  onAdd: (product: Product) => void;
-  onSubtract: (product: Product) => void;
+  onAdd: (product: Product) => boolean;
+  onSubtract: (product: Product) => boolean;
 };
 
 export function ProductCard({ product, onAdd, onSubtract }: Props) {
@@ -16,12 +16,12 @@ export function ProductCard({ product, onAdd, onSubtract }: Props) {
   const [selected, setSelected] = useState<number>(0);
 
   const increment = () => {
-    setSelected((prev) => prev + 1);
-    onAdd(product);
+    const productAdded = onAdd(product);
+    if (productAdded) setSelected((prev) => prev + 1);
   };
   const decrement = () => {
-    setSelected((prev) => (prev > 0 ? prev - 1 : prev));
-    onSubtract(product);
+    const productSubtracted = onSubtract(product);
+    if (productSubtracted) setSelected((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
   return (
