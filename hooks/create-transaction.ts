@@ -15,6 +15,7 @@ export function useCreateTransaction() {
     totalAmount: number;
     paymentMethod: string;
     paymentInfo: Payment;
+    receiptImageUri?: string;
   }) => {
     const {
       transactionId,
@@ -22,6 +23,7 @@ export function useCreateTransaction() {
       paymentMethod,
       totalAmount,
       paymentInfo,
+      receiptImageUri,
     } = data;
 
     // subtract product quantities from inventory
@@ -60,6 +62,7 @@ export function useCreateTransaction() {
         totalAmount: totalAmount,
         paymentMethod: paymentMethod,
         referenceNumber: paymentInfo.referenceNumber,
+        receiptImageUri: receiptImageUri,
       })
       .returning();
 

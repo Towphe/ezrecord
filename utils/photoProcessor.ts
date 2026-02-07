@@ -310,6 +310,7 @@ type DetectedObject = {
 
 type LocateFieldsResult = {
   transactionId: string;
+  receiptImageUri: string;
   detectedObjects: DetectedObject[];
 };
 
@@ -333,16 +334,11 @@ export async function locatePaymentFields(
   let srcHeight: number;
   let srcChannels: number;
 
-  try {
-    const decoded = await getRawBytes(newImagePath);
-    pixels = decoded.pixels;
-    srcWidth = decoded.width;
-    srcHeight = decoded.height;
-    srcChannels = decoded.channels || 3;
-  } catch (err) {
-    console.error("Image decoding failed", err);
-    return { detectedObjects: [], transactionId: "" };
-  }
+  const decoded = await getRawBytes(newImagePath);
+  pixels = decoded.pixels;
+  srcWidth = decoded.width;
+  srcHeight = decoded.height;
+  srcChannels = decoded.channels || 3;
 
   // Configuration: 20% Overlap between tiles
   const OVERLAP = 0.2;
@@ -454,12 +450,16 @@ export async function locatePaymentFields(
   }
 
   // save original image and detected crops to a "transactionId" folder for debugging
-  CameraRoll.saveAsset(newImagePath, {
+  const receiptImage = await CameraRoll.saveAsset(newImagePath, {
     type: "photo",
     album: `ezRecord`,
   });
 
-  return { detectedObjects, transactionId };
+  return {
+    detectedObjects,
+    transactionId,
+    receiptImageUri: receiptImage.node.image.uri,
+  };
 }
 
 export async function cropObject(

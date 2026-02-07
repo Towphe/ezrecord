@@ -81,10 +81,8 @@ export default function EReceiptCapture({
         referenceNumber: "",
       };
 
-      const { detectedObjects, transactionId } = await locatePaymentFields(
-        `file://${photo.path}`,
-        model,
-      );
+      const { detectedObjects, transactionId, receiptImageUri } =
+        await locatePaymentFields(`file://${photo.path}`, model);
 
       for (const obj of detectedObjects) {
         const text = await extractText(obj.croppedPath);
@@ -128,8 +126,6 @@ export default function EReceiptCapture({
         referenceNumber: paymentDetails.referenceNumber,
       };
 
-      console.log(treatedPayment);
-
       // Processing complete, show results or next steps
       navigation.navigate({
         name: "ReviewPayment",
@@ -138,6 +134,7 @@ export default function EReceiptCapture({
           selectedProducts: selectedProducts,
           totalAmount: totalAmount,
           paymentDetails: treatedPayment,
+          receiptImageUri,
         },
       } as never);
     } catch {

@@ -3,6 +3,7 @@ export type Transaction = {
   totalAmount: number;
   paymentMethod: string;
   referenceNumber: string | null;
+  receiptImageUri: string | null;
   isDeleted: number;
   createdAt: Date;
   updatedAt: Date;

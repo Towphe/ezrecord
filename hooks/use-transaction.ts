@@ -17,7 +17,7 @@ export function useTransaction(transactionId: string) {
   const [products, setProducts] = useState<TransactionProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchTransaction = async (name?: string) => {
+  const fetchTransaction = async () => {
     try {
       const data = await drizzleDb
         .select()
@@ -79,5 +79,10 @@ export function useTransaction(transactionId: string) {
     fetchTransaction();
   }, []);
 
-  return { transaction, products, loading, refetch: fetchTransaction };
+  return {
+    transaction,
+    products,
+    loading,
+    refetch: fetchTransaction,
+  };
 }

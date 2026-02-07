@@ -54,8 +54,13 @@ export default function ReviewPayment({
   const navigation = useNavigation();
   const { createTransaction } = useCreateTransaction();
 
-  const { selectedProducts, totalAmount, paymentDetails, transactionId } =
-    route.params;
+  const {
+    selectedProducts,
+    totalAmount,
+    paymentDetails,
+    transactionId,
+    receiptImageUri,
+  } = route.params;
   const [isEditing, setIsEditing] = useState(false);
 
   useLayoutEffect(() => {
@@ -102,6 +107,7 @@ export default function ReviewPayment({
         referenceNumber: data.referenceNumber,
         amount: data.amount,
       },
+      receiptImageUri: receiptImageUri,
     });
 
     navigation.navigate("CaptureHome" as never);

@@ -29,6 +29,7 @@ const MAPPING = {
   magnifyingglass: "search",
   pencil: "edit",
   stop: "cancel",
+  eye: "open-in-new",
 } as unknown as IconMapping;
 
 /**

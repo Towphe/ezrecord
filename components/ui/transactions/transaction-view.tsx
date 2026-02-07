@@ -4,9 +4,10 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTransaction } from "@/hooks/use-transaction";
 import { RouteProp, useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { Image, Modal, Pressable, ScrollView, StyleSheet } from "react-native";
 import { ProductItem } from "../capture/item-card";
+import { IconSymbol } from "../icon-symbol";
 
 function TransactionType({ type }: { type?: string }) {
   switch (type) {
@@ -29,6 +30,26 @@ function TransactionType({ type }: { type?: string }) {
   }
 }
 
+type ExitImageViewButtonProps = {
+  setImageViewOpen: (open: boolean) => void;
+};
+
+function ExitImageViewButton({ setImageViewOpen }: ExitImageViewButtonProps) {
+  return (
+    <Pressable
+      style={{
+        position: "absolute",
+        top: 60,
+        right: 15,
+        zIndex: 10,
+      }}
+      onPress={() => setImageViewOpen(false)}
+    >
+      <IconSymbol name="stop" size={36} color="#F2F2F2" />
+    </Pressable>
+  );
+}
+
 export default function TransactionView({
   route,
 }: {
@@ -41,6 +62,7 @@ export default function TransactionView({
     products,
     loading: transactionLoading,
   } = useTransaction(transactionId);
+  const [imageViewOpen, setImageViewOpen] = useState(false);
 
   useEffect(() => {
     if (!transaction && !transactionLoading) {
@@ -91,9 +113,46 @@ export default function TransactionView({
             <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
               Ref. No.:
             </ThemedText>
-            <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
-              {transaction?.referenceNumber || "N/A"}
-            </ThemedText>
+            <Pressable
+              onPress={() => setImageViewOpen(true)}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ThemedText
+                style={{
+                  ...styles.mediumFont,
+                  color: "#33333388",
+                  fontStyle: "italic",
+                }}
+              >
+                {transaction?.referenceNumber || "N/A"}
+              </ThemedText>
+              <IconSymbol
+                name="eye"
+                size={18}
+                color="#33333388"
+                style={{ marginLeft: 4 }}
+              />
+            </Pressable>
+
+            <Modal
+              animationType="none"
+              transparent={true}
+              visible={imageViewOpen}
+              onRequestClose={() => setImageViewOpen(false)}
+            >
+              <ExitImageViewButton setImageViewOpen={setImageViewOpen} />
+              <Image
+                src={transaction?.receiptImageUri!}
+                style={{
+                  flex: 1,
+                  width: "100%",
+                }}
+              />
+            </Modal>
           </ThemedView>
         </ThemedView>
       </ThemedView>
