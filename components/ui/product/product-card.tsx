@@ -82,20 +82,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
   },
   header: {
-    // flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    fontSize: 24,
+    fontSize: 20,
     width: "100%",
   },
   productName: {
-    fontSize: 24,
+    fontSize: 20,
     paddingBottom: 4,
     fontWeight: "400",
   },
   price: {
-    fontSize: 24,
+    fontSize: 20,
   },
   actionButtonGroup: {
     flexDirection: "row",

@@ -1,22 +1,28 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { StyleSheet } from "react-native";
+import TransactionsHome from "@/components/ui/transactions/transaction-home";
+import TransactionView from "@/components/ui/transactions/transaction-view";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-export default function TransactionsScreen() {
+export type TransactionsStackParamList = {
+  TransactionsHome: undefined;
+  TransactionView: { transactionId: string };
+};
+
+const TransactionScreenStack =
+  createNativeStackNavigator<TransactionsStackParamList>();
+
+export default function TransactionScreen() {
   return (
-    <ParallaxScrollView title="Transactions">
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Transactions</ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <TransactionScreenStack.Navigator screenOptions={{ headerShown: false }}>
+      <TransactionScreenStack.Screen
+        name="TransactionsHome"
+        component={TransactionsHome}
+        options={{ animation: "none" }}
+      />
+      <TransactionScreenStack.Screen
+        name="TransactionView"
+        component={TransactionView}
+        options={{ animation: "none" }}
+      />
+    </TransactionScreenStack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-});
