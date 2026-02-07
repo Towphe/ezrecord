@@ -38,7 +38,10 @@ export function ProductCard({ product, onAdd, onSubtract }: Props) {
           </Pressable>
         </ThemedView>
       </ThemedView>
-      <ThemedView>
+      <ThemedView style={{ flexDirection: "row", gap: 8 }}>
+        <ThemedText style={{ opacity: 0.5 }}>
+          (₱ {product.price.toFixed(2)})
+        </ThemedText>
         <ThemedText style={styles.quantity}>Quantity: {quantity}</ThemedText>
       </ThemedView>
     </ThemedView>
