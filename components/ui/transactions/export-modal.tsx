@@ -66,7 +66,6 @@ export function ExportModal({
                 Export Transactions
               </ThemedText>
               <Pressable onPress={() => setDownloadModalOpen(false)}>
-                {" "}
                 <IconSymbol name="stop" size={28} color="#3333333" />
               </Pressable>
             </ThemedView>
