@@ -1,10 +1,18 @@
 import { DEFAULT_LIMIT } from "@/constants/limits.ts";
 import { Transaction } from "@/types/transaction.ts";
-import { and, eq, gt, like } from "drizzle-orm";
+import { and, asc, desc, eq, gt, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as schema from "../db/schema.ts";
+
+type FetchTransactionsParams = {
+  transactionId?: string;
+  limit?: number;
+  after?: Date;
+  sortOrder?: "asc" | "desc";
+  paymentMethod?: "cash" | "gcash" | "maya" | "bpi" | "all";
+};
 
 export function useTransactions() {
   const db = useSQLiteContext();
@@ -18,11 +26,9 @@ export function useTransactions() {
       transactionId,
       limit,
       after,
-    }: {
-      transactionId?: string;
-      limit?: number;
-      after?: Date;
-    }) => {
+      sortOrder = "desc",
+      paymentMethod = "all",
+    }: FetchTransactionsParams) => {
       try {
         const filters = [eq(schema.transaction.isDeleted, 0)];
 
@@ -36,10 +42,18 @@ export function useTransactions() {
           );
         }
 
+        if (paymentMethod !== "all") {
+          filters.push(eq(schema.transaction.paymentMethod, paymentMethod));
+        }
+
         const baseQuery = drizzleDb.select().from(schema.transaction);
 
         const data = await baseQuery
-          .orderBy(schema.transaction.createdAt)
+          .orderBy(
+            sortOrder === "asc"
+              ? asc(schema.transaction.createdAt)
+              : desc(schema.transaction.createdAt),
+          )
           .limit(limit ?? DEFAULT_LIMIT)
           .where(and(...filters));
 

@@ -12,8 +12,17 @@ import {
 } from "react-native";
 import { IconSymbol } from "../icon-symbol";
 import { ExportModal } from "./export-modal";
+import { TransactionFilterModal } from "./filter-modal";
 import { SearchTransaction } from "./search-transaction";
 import { TransactionCard } from "./transaction-card";
+
+function FilterButton({ toggleFilter }: { toggleFilter: () => void }) {
+  return (
+    <Pressable style={{ marginTop: 36 }} onPress={toggleFilter}>
+      <IconSymbol name="fuel.filter.water" size={24} color="#F2F2F2" />
+    </Pressable>
+  );
+}
 
 function DownloadButton({ onDownloadPress }: { onDownloadPress: () => void }) {
   return (
@@ -23,9 +32,19 @@ function DownloadButton({ onDownloadPress }: { onDownloadPress: () => void }) {
   );
 }
 
+type TransactionFilters = {
+  sortOrder: "asc" | "desc";
+  paymentMethod: "cash" | "gcash" | "maya" | "bpi" | "all";
+};
+
 export default function TransactionsHome() {
   const [transactionId, setTransactionId] = useState("");
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [filters, setFilters] = useState<TransactionFilters>({
+    sortOrder: "asc",
+    paymentMethod: "all",
+  });
 
   const {
     transactions,
@@ -35,14 +54,14 @@ export default function TransactionsHome() {
 
   const handleSearch = (transactionId: string) => {
     setTransactionId(transactionId);
-    refetchTransactions({ transactionId });
+    refetchTransactions({ transactionId, ...filters });
   };
 
   // Refetch when the screen comes into focus so newly created transactions appear
   useFocusEffect(
     useCallback(() => {
-      refetchTransactions({ transactionId });
-    }, [refetchTransactions, transactionId]),
+      refetchTransactions({ transactionId, ...filters });
+    }, [refetchTransactions, transactionId, filters]),
   );
 
   if (transactionsLoading) {
@@ -53,17 +72,27 @@ export default function TransactionsHome() {
     );
   }
 
-  if (
-    !transactionsLoading &&
-    transactions.length === 0 &&
-    transactionId === ""
-  ) {
+  if (!transactionsLoading && transactions.length === 0) {
     return (
-      <ParallaxScrollView title="Transactions">
+      <ParallaxScrollView
+        leftSibling={
+          <FilterButton toggleFilter={() => setIsFilterVisible(true)} />
+        }
+        title="Transactions"
+        rightSibling={
+          <DownloadButton onDownloadPress={() => setDownloadModalOpen(true)} />
+        }
+      >
         <ThemedView style={styles.page}>
           <ThemedText style={{ marginTop: 32 }}>
             No transactions found.
           </ThemedText>
+          <SearchTransaction onSearch={handleSearch} />
+          <TransactionFilterModal
+            modalOpen={isFilterVisible}
+            setModalOpen={setIsFilterVisible}
+            setFilters={setFilters}
+          />
         </ThemedView>
       </ParallaxScrollView>
     );
@@ -71,6 +100,9 @@ export default function TransactionsHome() {
 
   return (
     <ParallaxScrollView
+      leftSibling={
+        <FilterButton toggleFilter={() => setIsFilterVisible(true)} />
+      }
       title="Transactions"
       rightSibling={
         <DownloadButton onDownloadPress={() => setDownloadModalOpen(true)} />
@@ -98,6 +130,11 @@ export default function TransactionsHome() {
           }
         />
         <SearchTransaction onSearch={handleSearch} />
+        <TransactionFilterModal
+          modalOpen={isFilterVisible}
+          setModalOpen={setIsFilterVisible}
+          setFilters={setFilters}
+        />
       </ThemedView>
       <ExportModal
         setDownloadModalOpen={setDownloadModalOpen}
