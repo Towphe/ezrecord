@@ -76,7 +76,7 @@ export default function StatisticsHome() {
             <PaymentLegend method="G-Cash" color={METHOD_COLORS.gcash} />
             <PaymentLegend method="Maya" color={METHOD_COLORS.maya} />
             <PaymentLegend method="BPI" color={METHOD_COLORS.bpi} />
-            <PaymentLegend method="Other" color={METHOD_COLORS.other} />
+            <PaymentLegend method="Cash" color={METHOD_COLORS.cash} />
           </ThemedView>
         </ThemedView>
         <ScrollView style={styles.topProductsContainer}>

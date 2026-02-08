@@ -2,8 +2,12 @@ import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useCreateTransaction } from "@/hooks/create-transaction";
 import { RouteProp, useNavigation } from "@react-navigation/native";
+import * as Crypto from "expo-crypto";
+import { useState } from "react";
 import { Button, StyleSheet } from "react-native";
+import { ConfirmCashPaymentModal } from "./confirm-cash-payment-modal";
 import { ProductItem } from "./item-card";
 
 export default function ReviewOrder({
@@ -12,11 +16,14 @@ export default function ReviewOrder({
   route: RouteProp<CaptureStackParamList, "ReviewOrder">;
 }) {
   const navigation = useNavigation();
+  const { createTransaction } = useCreateTransaction();
   const { selectedProducts } = route.params;
   const total = selectedProducts.reduce(
     (sum, product) => sum + product.quantity * product.unitPrice,
     0,
   );
+  const [confirmCashPaymentModalOpen, setConfirmCashPaymentModalOpen] =
+    useState(false);
 
   const handleEPayment = () => {
     navigation.navigate({
@@ -29,8 +36,31 @@ export default function ReviewOrder({
   };
 
   const handleCashPayment = () => {
-    // Handle cash payment logic here
-    // simply create a transaction and update inventory
+    setConfirmCashPaymentModalOpen(true);
+  };
+
+  const confirmCashPayment = async () => {
+    await createTransaction({
+      transactionId: Crypto.randomUUID(),
+      selectedProducts: selectedProducts,
+      totalAmount: total,
+      paymentMethod: "cash",
+      paymentInfo: {
+        name: null,
+        accountNumber: null,
+        referenceNumber: "N/A",
+        amount: total,
+      },
+    });
+
+    setConfirmCashPaymentModalOpen(false);
+    navigation.navigate({
+      name: "CaptureHome",
+      params: {
+        selectedProducts: selectedProducts,
+        totalAmount: total,
+      },
+    } as never);
   };
 
   return (
@@ -47,6 +77,11 @@ export default function ReviewOrder({
           </ThemedText>
           <Button title="E-Payment" color="teal" onPress={handleEPayment} />
           <Button title="Cash" color="green" onPress={handleCashPayment} />
+          <ConfirmCashPaymentModal
+            isOpen={confirmCashPaymentModalOpen}
+            setIsOpen={setConfirmCashPaymentModalOpen}
+            onConfirm={confirmCashPayment}
+          />
         </ThemedView>
       </ThemedView>
     </ParallaxScrollView>
