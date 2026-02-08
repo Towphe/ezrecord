@@ -1,6 +1,7 @@
 import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import { ThemedText } from "@/components/themed-text";
 import { RouteProp, useNavigation } from "@react-navigation/native";
+import * as Crypto from "expo-crypto";
 import { Button, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -23,6 +24,27 @@ export default function ErrorScanning({
     } as never);
   };
 
+  const redirectToReviewPayment = () => {
+    const transactionId = Crypto.randomUUID();
+    const paymentDetails = {
+      name: null,
+      accountNumber: null,
+      referenceNumber: "N/A",
+      amount: totalAmount,
+    };
+
+    navigation.navigate({
+      name: "ReviewPayment",
+      params: {
+        transactionId,
+        selectedProducts: selectedProducts,
+        totalAmount: totalAmount,
+        paymentDetails,
+        referenceNumber: "N/A",
+      },
+    } as never);
+  };
+
   const cancel = () => {
     navigation.navigate("CaptureHome" as never);
   };
@@ -35,6 +57,11 @@ export default function ErrorScanning({
       </View>
       <View style={styles.buttonGroup}>
         <Button title="Try Again" color="grey" onPress={redirectToScan} />
+        <Button
+          title="Record Manually"
+          color="orange"
+          onPress={redirectToReviewPayment}
+        />
         <Button title="Cancel" color="maroon" onPress={cancel} />
       </View>
     </View>

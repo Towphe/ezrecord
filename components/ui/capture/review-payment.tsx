@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
   StyleSheet,
+  Text,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import * as z from "zod";
@@ -41,14 +42,18 @@ function EditButton({
   if (isEditing) {
     return (
       <Pressable style={{ marginTop: 36 }} onPress={() => setIsEditing(false)}>
-        <IconSymbol name="stop" size={20} color="#F2F2F2" />
+        <Text>
+          <IconSymbol name="stop" size={20} color="#F2F2F2" />
+        </Text>
       </Pressable>
     );
   }
 
   return (
     <Pressable style={{ marginTop: 36 }} onPress={() => setIsEditing(true)}>
-      <IconSymbol name="pencil" size={20} color="#F2F2F2" />;
+      <Text>
+        <IconSymbol name="pencil" size={20} color="#F2F2F2" />;
+      </Text>
     </Pressable>
   );
 }

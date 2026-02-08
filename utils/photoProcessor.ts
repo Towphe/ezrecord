@@ -414,6 +414,10 @@ export async function locatePaymentFields(
   const detectedObjects: DetectedObject[] = [];
 
   for (const det of finalDetections) {
+    if (det.score < 0.6) {
+      continue;
+    }
+
     // Note: cropObject must handle the FULL High-Res image URI
     const croppedObject = await cropObject(
       "transaction_field",
