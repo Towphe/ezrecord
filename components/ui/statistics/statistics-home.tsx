@@ -60,11 +60,26 @@ export default function StatisticsHome() {
 
   if (!loading && statistics?.totalPayments === 0) {
     return (
-      <ParallaxScrollView title="Statistics">
+      <ParallaxScrollView
+        title="Statistics"
+        rightSibling={
+          <FilterButton
+            toggleFilter={() =>
+              setDateRangeSelectorOpen(!dateRangeSelectorOpen)
+            }
+          />
+        }
+      >
         <ThemedView style={styles.page}>
-          <ThemedText style={{ marginTop: 32 }}>
-            No payments in the last 30 days.
-          </ThemedText>
+          <ThemedView style={{ marginTop: 32 }}>
+            <ThemedText style={{ textAlign: "center" }}>
+              No payments found in time range
+            </ThemedText>
+            <ThemedText style={{ opacity: 0.6, textAlign: "center" }}>
+              ({selectedDates.startDate.toLocaleDateString()} -{" "}
+              {selectedDates.endDate.toLocaleDateString()}).
+            </ThemedText>
+          </ThemedView>
         </ThemedView>
       </ParallaxScrollView>
     );
