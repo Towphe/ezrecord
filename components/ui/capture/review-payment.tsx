@@ -33,7 +33,6 @@ function EditButton({
   if (isEditing) {
     return (
       <Pressable style={{ marginTop: 36 }} onPress={() => setIsEditing(false)}>
-        {" "}
         <IconSymbol name="stop" size={20} color="#F2F2F2" />
       </Pressable>
     );
