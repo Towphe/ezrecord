@@ -166,6 +166,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   largeText: {
-    fontSize: 28,
+    fontSize: 24,
   },
 });

@@ -42,7 +42,7 @@ export function useStatistics() {
         ),
       );
 
-    return total[0].totalAmount || 0;
+    return parseFloat(total[0].totalAmount || "0");
   };
 
   const fetchTopProducts = async (days: number = 30, limit: number = 5) => {
@@ -84,6 +84,7 @@ export function useStatistics() {
         count: count(schema.transaction.paymentMethod),
       })
       .from(schema.transaction)
+      .groupBy(schema.transaction.paymentMethod)
       .where(
         and(
           eq(schema.transaction.isDeleted, 0),
@@ -105,7 +106,7 @@ export function useStatistics() {
       const topProducts = await fetchTopProducts();
 
       setStatistics({
-        totalPayments: parseFloat(totalPayments.toString()),
+        totalPayments: totalPayments,
         paymentMethods: paymentMethods,
         topProducts: topProducts.map((product) => ({
           productId: product.productId,
