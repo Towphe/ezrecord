@@ -135,13 +135,13 @@ export default function CaptureHome({
 
   useFocusEffect(
     useCallback(() => {
-      refetch({ name });
+      refetch({ name, hasStock: "instock" });
     }, [name, refetch]),
   );
 
   const handleSearch = (name: string) => {
     setName(name);
-    refetch({ name, limit: 10 });
+    refetch({ name, limit: 10, hasStock: "instock" });
   };
 
   if (productLoading) {
