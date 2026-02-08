@@ -53,6 +53,18 @@ export default function TransactionsHome() {
     );
   }
 
+  if (!transactionsLoading && transactions.length === 0) {
+    return (
+      <ParallaxScrollView title="Transactions">
+        <ThemedView style={styles.page}>
+          <ThemedText style={{ marginTop: 32 }}>
+            No transactions found.
+          </ThemedText>
+        </ThemedView>
+      </ParallaxScrollView>
+    );
+  }
+
   return (
     <ParallaxScrollView
       title="Transactions"
