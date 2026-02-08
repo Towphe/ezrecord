@@ -4,32 +4,13 @@ import { Payment, UntreatedPayment } from "@/types/payment";
 import { extractText, locatePaymentFields } from "@/utils/photoProcessor";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState } from "react";
-import {
-  PermissionsAndroid,
-  Platform,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { useTensorflowModel } from "react-native-fast-tflite";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PhotoFile } from "react-native-vision-camera";
 import { ProcessingScreen } from "./processing-screen";
 
 const YOLO_MODEL = require("../../../assets/models/yolo.tflite");
-
-async function hasAndroidPermission() {
-  const permission =
-    parseInt(Platform.Version as string) >= 33
-      ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-      : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-
-  const hasPermission = await PermissionsAndroid.check(permission);
-  if (hasPermission) return true;
-
-  const status = await PermissionsAndroid.request(permission);
-  return status === "granted";
-}
 
 export default function EReceiptCapture({
   route,
