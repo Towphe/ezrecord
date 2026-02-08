@@ -32,6 +32,7 @@ const MAPPING = {
   eye: "open-in-new",
   "square.and.arrow.down": "file-download",
   calendar: "date-range",
+  gear: "settings",
 } as unknown as IconMapping;
 
 /**

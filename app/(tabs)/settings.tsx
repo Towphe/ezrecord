@@ -3,11 +3,11 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { StyleSheet } from "react-native";
 
-export default function AccountScreen() {
+export default function SettingsScreen() {
   return (
-    <ParallaxScrollView title="Account">
+    <ParallaxScrollView title="Settings">
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Account</ThemedText>
+        <ThemedText type="title">Settings</ThemedText>
       </ThemedView>
       {/* <ThemedView style={styles.stepContainer}></ThemedView> */}
     </ParallaxScrollView>
