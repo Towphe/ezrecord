@@ -2,8 +2,7 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useProducts } from "@/hooks/use-products";
-import { useNavigation } from "@react-navigation/native";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,

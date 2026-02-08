@@ -1,7 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Transaction } from "@/types/transaction";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 
 export function TransactionCard({
