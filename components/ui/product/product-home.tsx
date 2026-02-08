@@ -55,7 +55,7 @@ export function ProductsHome() {
     );
   }
 
-  if (!productLoading && products.length === 0) {
+  if (!productLoading && products.length === 0 && name === "") {
     return (
       <ParallaxScrollView
         title="Products"
@@ -63,7 +63,6 @@ export function ProductsHome() {
       >
         <ThemedView style={styles.page}>
           <ThemedText style={{ marginTop: 32 }}>No products found.</ThemedText>
-          <SearchProduct onSearch={handleSearch} />
         </ThemedView>
       </ParallaxScrollView>
     );

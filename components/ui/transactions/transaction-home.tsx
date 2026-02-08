@@ -53,7 +53,11 @@ export default function TransactionsHome() {
     );
   }
 
-  if (!transactionsLoading && transactions.length === 0) {
+  if (
+    !transactionsLoading &&
+    transactions.length === 0 &&
+    transactionId === ""
+  ) {
     return (
       <ParallaxScrollView title="Transactions">
         <ThemedView style={styles.page}>
