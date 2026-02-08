@@ -11,8 +11,23 @@ import {
   StyleSheet,
 } from "react-native";
 import { IconSymbol } from "../icon-symbol";
+import { ProductFilterModal } from "./filter-modal";
 import { ProductCard } from "./product-card";
 import { SearchProduct } from "./search-product";
+
+type ProductFilters = {
+  sortBy: "name" | "dateAdded";
+  sortOrder: "asc" | "desc";
+  hasStock: "instock" | "outofstock" | "all";
+};
+
+function FilterButton({ toggleFilter }: { toggleFilter: () => void }) {
+  return (
+    <Pressable style={{ marginTop: 36 }} onPress={toggleFilter}>
+      <IconSymbol name="fuel.filter.water" size={24} color="#F2F2F2" />
+    </Pressable>
+  );
+}
 
 type CreateButtonProps = {
   handleCreatePress: () => void;
@@ -30,6 +45,12 @@ export function ProductsHome() {
   const navigation = useNavigation();
   const { products, loading: productLoading, refetch } = useProducts();
   const [name, setName] = useState("");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [filters, setFilters] = useState<ProductFilters>({
+    sortBy: "name",
+    sortOrder: "asc",
+    hasStock: "all",
+  });
 
   const handleCreatePress = () => {
     navigation.navigate({ name: "CreateProduct" } as never);
@@ -42,8 +63,8 @@ export function ProductsHome() {
 
   useFocusEffect(
     useCallback(() => {
-      refetch({ name });
-    }, [name, refetch]),
+      refetch({ name, ...filters });
+    }, [name, filters, refetch]),
   );
 
   if (productLoading) {
@@ -54,14 +75,25 @@ export function ProductsHome() {
     );
   }
 
-  if (!productLoading && products.length === 0 && name === "") {
+  if (!productLoading && products.length === 0) {
     return (
       <ParallaxScrollView
+        leftSibling={
+          <FilterButton
+            toggleFilter={() => setIsFilterVisible(!isFilterVisible)}
+          />
+        }
         title="Products"
         rightSibling={<CreateButton handleCreatePress={handleCreatePress} />}
       >
         <ThemedView style={styles.page}>
           <ThemedText style={{ marginTop: 32 }}>No products found.</ThemedText>
+          <SearchProduct onSearch={handleSearch} />
+          <ProductFilterModal
+            modalOpen={isFilterVisible}
+            setModalOpen={setIsFilterVisible}
+            setFilters={setFilters}
+          />
         </ThemedView>
       </ParallaxScrollView>
     );
@@ -69,6 +101,11 @@ export function ProductsHome() {
 
   return (
     <ParallaxScrollView
+      leftSibling={
+        <FilterButton
+          toggleFilter={() => setIsFilterVisible(!isFilterVisible)}
+        />
+      }
       title="Products"
       rightSibling={<CreateButton handleCreatePress={handleCreatePress} />}
     >
@@ -96,6 +133,11 @@ export function ProductsHome() {
         />
         <SearchProduct onSearch={handleSearch} />
       </ThemedView>
+      <ProductFilterModal
+        modalOpen={isFilterVisible}
+        setModalOpen={setIsFilterVisible}
+        setFilters={setFilters}
+      />
     </ParallaxScrollView>
   );
 }
