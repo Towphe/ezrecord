@@ -30,6 +30,8 @@ const MAPPING = {
   pencil: "edit",
   stop: "cancel",
   eye: "open-in-new",
+  "square.and.arrow.down": "file-download",
+  calendar: "date-range",
 } as unknown as IconMapping;
 
 /**

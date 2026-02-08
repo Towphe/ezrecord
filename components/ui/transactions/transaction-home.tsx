@@ -4,12 +4,28 @@ import { ThemedView } from "@/components/themed-view";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+} from "react-native";
+import { IconSymbol } from "../icon-symbol";
+import { ExportModal } from "./export-modal";
 import { SearchTransaction } from "./search-transaction";
 import { TransactionCard } from "./transaction-card";
 
+function DownloadButton({ onDownloadPress }: { onDownloadPress: () => void }) {
+  return (
+    <Pressable style={{ marginTop: 36 }} onPress={onDownloadPress}>
+      <IconSymbol name="square.and.arrow.down" size={24} color="#F2F2F2" />
+    </Pressable>
+  );
+}
+
 export default function TransactionsHome() {
   const [transactionId, setTransactionId] = useState("");
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
 
   const {
     transactions,
@@ -38,7 +54,12 @@ export default function TransactionsHome() {
   }
 
   return (
-    <ParallaxScrollView title="Transactions">
+    <ParallaxScrollView
+      title="Transactions"
+      rightSibling={
+        <DownloadButton onDownloadPress={() => setDownloadModalOpen(true)} />
+      }
+    >
       <ThemedView style={styles.page}>
         <FlatList
           data={transactions}
@@ -62,6 +83,10 @@ export default function TransactionsHome() {
         />
         <SearchTransaction onSearch={handleSearch} />
       </ThemedView>
+      <ExportModal
+        setDownloadModalOpen={setDownloadModalOpen}
+        downloadModalOpen={downloadModalOpen}
+      />
     </ParallaxScrollView>
   );
 }
