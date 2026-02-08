@@ -33,6 +33,7 @@ const MAPPING = {
   "square.and.arrow.down": "file-download",
   calendar: "date-range",
   gear: "settings",
+  "fuel.filter.water": "filter-list",
 } as unknown as IconMapping;
 
 /**
