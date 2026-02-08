@@ -11,7 +11,7 @@ export default function ErrorScanning({
   route: RouteProp<CaptureStackParamList, "ErrorScanning">;
 }) {
   const navigation = useNavigation();
-  const { selectedProducts, totalAmount } = route.params;
+  const { selectedProducts, totalAmount, receiptImageUri } = route.params;
   const insets = useSafeAreaInsets();
 
   const redirectToScan = () => {
@@ -41,6 +41,7 @@ export default function ErrorScanning({
         totalAmount: totalAmount,
         paymentDetails,
         referenceNumber: "N/A",
+        receiptImageUri,
       },
     } as never);
   };

@@ -19,6 +19,7 @@ export type CaptureStackParamList = {
     receiptImageUri: string;
   };
   ErrorScanning: {
+    receiptImageUri: string;
     selectedProducts: SelectedProduct[];
     totalAmount: number;
     message: string;

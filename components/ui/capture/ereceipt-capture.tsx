@@ -95,7 +95,16 @@ export default function EReceiptCapture({
         paymentDetails.amount === "" ||
         paymentDetails.referenceNumber === ""
       ) {
-        throw new Error("Essential payment details missing");
+        navigation.navigate({
+          name: "ErrorScanning",
+          params: {
+            message: "Error scanning e-receipt. Please try again.",
+            selectedProducts,
+            totalAmount,
+            receiptImageUri,
+          },
+        } as never);
+        return;
       }
 
       const treatedPayment: Payment = {
