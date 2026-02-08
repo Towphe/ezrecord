@@ -105,7 +105,12 @@ export default function TransactionView({
             </ThemedText>
             <TransactionType type={transaction?.paymentMethod} />
           </ThemedView>
-          <ThemedView style={styles.paymentDetailsRow}>
+          <ThemedView
+            style={{
+              ...styles.paymentDetailsRow,
+              display: transaction?.receiptImageUri ? "flex" : "none",
+            }}
+          >
             <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
               Ref. No.:
             </ThemedText>
@@ -116,6 +121,7 @@ export default function TransactionView({
                 alignItems: "center",
                 justifyContent: "center",
               }}
+              disabled={!transaction?.receiptImageUri}
             >
               <ThemedText
                 style={{
