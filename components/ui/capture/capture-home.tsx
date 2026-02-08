@@ -6,7 +6,8 @@ import { useProducts } from "@/hooks/use-products";
 import { SelectedProduct } from "@/types/product-selection";
 import { Product } from "@/types/products";
 import { RouteProp, useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -132,6 +133,12 @@ export default function CaptureHome({
     } as never);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch({ name });
+    }, [name, refetch]),
+  );
+
   const handleSearch = (name: string) => {
     setName(name);
     refetch({ name, limit: 10 });
@@ -142,6 +149,16 @@ export default function CaptureHome({
     return (
       <ParallaxScrollView title="Products">
         <ThemedText>Loading...</ThemedText>
+      </ParallaxScrollView>
+    );
+  }
+
+  if (!productLoading && products.length === 0) {
+    return (
+      <ParallaxScrollView title="Capture">
+        <ThemedView style={styles.page}>
+          <ThemedText style={{ marginTop: 32 }}>No products found.</ThemedText>
+        </ThemedView>
       </ParallaxScrollView>
     );
   }

@@ -3,7 +3,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useProducts } from "@/hooks/use-products";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -37,13 +38,33 @@ export function ProductsHome() {
 
   const handleSearch = (name: string) => {
     setName(name);
-    refetch({ name, limit: 10 });
+    refetch({ name });
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch({ name });
+    }, [name, refetch]),
+  );
 
   if (productLoading) {
     return (
       <ParallaxScrollView title="Products">
         <ThemedText>Loading...</ThemedText>
+      </ParallaxScrollView>
+    );
+  }
+
+  if (!productLoading && products.length === 0) {
+    return (
+      <ParallaxScrollView
+        title="Products"
+        rightSibling={<CreateButton handleCreatePress={handleCreatePress} />}
+      >
+        <ThemedView style={styles.page}>
+          <ThemedText style={{ marginTop: 32 }}>No products found.</ThemedText>
+          <SearchProduct onSearch={handleSearch} />
+        </ThemedView>
       </ParallaxScrollView>
     );
   }
