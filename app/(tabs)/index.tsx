@@ -1,16 +1,22 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import StatisticsHome from "@/components/ui/statistics/statistics-home";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StyleSheet } from "react-native";
+
+export type StatisticsStackParamList = {
+  StatisticsHome: undefined;
+};
+
+const StatisticsScreenStack =
+  createNativeStackNavigator<StatisticsStackParamList>();
 
 export default function StatisticsScreen() {
   return (
-    <ParallaxScrollView title="Statistics">
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Statistics</ThemedText>
-      </ThemedView>
-      {/* <ThemedView style={styles.stepContainer}></ThemedView> */}
-    </ParallaxScrollView>
+    <StatisticsScreenStack.Navigator screenOptions={{ headerShown: false }}>
+      <StatisticsScreenStack.Screen
+        name="StatisticsHome"
+        component={StatisticsHome}
+      />
+    </StatisticsScreenStack.Navigator>
   );
 }
 
