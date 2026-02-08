@@ -1,4 +1,5 @@
 import { CaptureStackParamList } from "@/app/(tabs)/capture";
+import { DropdownField } from "@/components/dropdown";
 import { InputField } from "@/components/input-field";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
@@ -18,9 +19,16 @@ import Toast from "react-native-toast-message";
 import * as z from "zod";
 import { IconSymbol } from "../icon-symbol";
 
+const paymentTypes = [
+  { label: "GCash", value: "gcash" },
+  { label: "Maya", value: "maya" },
+  { label: "BPI Vybe", value: "bpi-vybe" },
+];
+
 const schema = z.object({
   amount: z.number(),
   referenceNumber: z.string(),
+  paymentType: z.enum(["gcash", "maya", "bpi-vybe"]),
 });
 
 function EditButton({
@@ -99,7 +107,7 @@ export default function ReviewPayment({
       transactionId: transactionId,
       selectedProducts: selectedProducts,
       totalAmount: totalAmount,
-      paymentMethod: "epayment",
+      paymentMethod: data.paymentType,
       paymentInfo: {
         name: null,
         accountNumber: null,
@@ -156,6 +164,19 @@ export default function ReviewPayment({
           {errors.referenceNumber && (
             <ThemedText>{errors.referenceNumber.message}</ThemedText>
           )}
+          <DropdownField
+            fieldName="paymentType"
+            label="Payment Type (not automatically detected)"
+            control={control}
+            defaultValue={"gcash"}
+            items={paymentTypes}
+            disabled={!isEditing}
+            containerStyle={styles.dropdownField}
+            labelStyle={styles.dropdownLabel}
+            inputStyle={{
+              inputAndroid: styles.dropdownInput,
+            }}
+          />
         </KeyboardAvoidingView>
         <ThemedView style={styles.actionButtons}>
           <Button
@@ -196,5 +217,20 @@ const styles = StyleSheet.create({
     gap: 6,
     marginHorizontal: "auto",
     width: "95%",
+  },
+  dropdownLabel: {
+    marginBottom: 4,
+  },
+  dropdownField: {
+    color: "#333",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingHorizontal: 6,
+    borderRadius: 8,
+    marginTop: 2,
+    width: "100%",
+  },
+  dropdownInput: {
+    color: "#333",
   },
 });

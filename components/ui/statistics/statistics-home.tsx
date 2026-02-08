@@ -53,8 +53,10 @@ export default function StatisticsHome() {
             series={statistics?.paymentMethods ?? []}
           />
           <ThemedView style={styles.paymentDistributionLegends}>
-            <PaymentLegend method="Cash" color={METHOD_COLORS.cash} />
-            <PaymentLegend method="E-Payment" color={METHOD_COLORS.epayment} />
+            <PaymentLegend method="G-Cash" color={METHOD_COLORS.gcash} />
+            <PaymentLegend method="Maya" color={METHOD_COLORS.maya} />
+            <PaymentLegend method="BPI" color={METHOD_COLORS.bpi} />
+            <PaymentLegend method="Other" color={METHOD_COLORS.other} />
           </ThemedView>
         </ThemedView>
         <ScrollView style={styles.topProductsContainer}>
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: 36,
+    gap: 12,
     marginTop: 24,
   },
   topProducts: {

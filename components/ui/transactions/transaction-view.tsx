@@ -9,25 +9,21 @@ import { Image, Modal, Pressable, ScrollView, StyleSheet } from "react-native";
 import { ProductItem } from "../capture/item-card";
 import { IconSymbol } from "../icon-symbol";
 
+const transactionTypeMap: Record<string, string> = {
+  cash: "Cash",
+  gcash: "GCash",
+  maya: "Maya",
+  "bpi-vybe": "BPI Vybe",
+};
+
 function TransactionType({ type }: { type?: string }) {
-  switch (type) {
-    case "epayment":
-      return (
-        <ThemedView>
-          <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
-            E-Payment
-          </ThemedText>
-        </ThemedView>
-      );
-    default:
-      return (
-        <ThemedView>
-          <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
-            Cash
-          </ThemedText>
-        </ThemedView>
-      );
-  }
+  return (
+    <ThemedView>
+      <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
+        {type ? transactionTypeMap[type] || type : "N/A"}
+      </ThemedText>
+    </ThemedView>
+  );
 }
 
 type ExitImageViewButtonProps = {
