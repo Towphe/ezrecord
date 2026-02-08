@@ -1,5 +1,5 @@
 import { METHOD_COLORS } from "@/constants/statistics.ts";
-import { and, count, eq, gt, sum } from "drizzle-orm";
+import { and, count, eq, gt, lt, sum } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -26,10 +26,7 @@ export function useStatistics() {
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchTotalPayments = async (days: number = 30) => {
-    const now = new Date();
-    const pastDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-
+  const fetchTotalPayments = async (startDate: Date, endDate: Date) => {
     const total = await drizzleDb
       .select({
         totalAmount: sum(schema.transaction.totalAmount),
@@ -38,17 +35,19 @@ export function useStatistics() {
       .where(
         and(
           eq(schema.transaction.isDeleted, 0),
-          gt(schema.transaction.createdAt, pastDate.getTime().toString()),
+          lt(schema.transaction.createdAt, endDate.getTime().toString()),
+          gt(schema.transaction.createdAt, startDate.getTime().toString()),
         ),
       );
 
     return parseFloat(total[0].totalAmount || "0");
   };
 
-  const fetchTopProducts = async (days: number = 30, limit: number = 5) => {
-    const now = new Date();
-    const pastDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-
+  const fetchTopProducts = async (
+    startDate: Date,
+    endDate: Date,
+    limit: number = 5,
+  ) => {
     const topProducts = await drizzleDb
       .select({
         productId: schema.product.productId,
@@ -63,9 +62,10 @@ export function useStatistics() {
       .where(
         and(
           eq(schema.transactionProduct.isDeleted, 0),
+          lt(schema.transactionProduct.createdAt, endDate.getTime().toString()),
           gt(
             schema.transactionProduct.createdAt,
-            pastDate.getTime().toString(),
+            startDate.getTime().toString(),
           ),
         ),
       )
@@ -74,10 +74,7 @@ export function useStatistics() {
     return topProducts;
   };
 
-  const fetchPaymentMethods = async (days: number = 30) => {
-    const now = new Date();
-    const pastDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-
+  const fetchPaymentMethods = async (startDate: Date, endDate: Date) => {
     const paymentMethods = await drizzleDb
       .select({
         paymentMethod: schema.transaction.paymentMethod,
@@ -88,7 +85,8 @@ export function useStatistics() {
       .where(
         and(
           eq(schema.transaction.isDeleted, 0),
-          gt(schema.transaction.createdAt, pastDate.getTime().toString()),
+          lt(schema.transaction.createdAt, endDate.getTime().toString()),
+          gt(schema.transaction.createdAt, startDate.getTime().toString()),
         ),
       );
 
@@ -98,31 +96,37 @@ export function useStatistics() {
     }));
   };
 
-  const fetchStatistics = useCallback(async () => {
-    setLoading(true);
-    try {
-      const totalPayments = await fetchTotalPayments();
-      const paymentMethods = await fetchPaymentMethods();
-      const topProducts = await fetchTopProducts();
+  const fetchStatistics = useCallback(
+    async (startDate: Date, endDate: Date) => {
+      setLoading(true);
+      try {
+        const totalPayments = await fetchTotalPayments(startDate, endDate);
+        const paymentMethods = await fetchPaymentMethods(startDate, endDate);
+        const topProducts = await fetchTopProducts(startDate, endDate);
 
-      setStatistics({
-        totalPayments: totalPayments,
-        paymentMethods: paymentMethods,
-        topProducts: topProducts.map((product) => ({
-          productId: product.productId,
-          name: product.name,
-          totalQuantity: product.totalQuantity
-            ? parseFloat(product.totalQuantity.toString())
-            : 0,
-        })),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [drizzleDb]);
+        setStatistics({
+          totalPayments: totalPayments,
+          paymentMethods: paymentMethods,
+          topProducts: topProducts.map((product) => ({
+            productId: product.productId,
+            name: product.name,
+            totalQuantity: product.totalQuantity
+              ? parseFloat(product.totalQuantity.toString())
+              : 0,
+          })),
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [drizzleDb],
+  );
 
   useEffect(() => {
-    fetchStatistics();
+    fetchStatistics(
+      new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
+      new Date(),
+    );
   }, [fetchStatistics]);
 
   return { statistics, loading, fetchStatistics };

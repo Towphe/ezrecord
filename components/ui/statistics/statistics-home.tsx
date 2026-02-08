@@ -4,9 +4,19 @@ import { ThemedView } from "@/components/themed-view";
 import { METHOD_COLORS } from "@/constants/statistics";
 import { useStatistics } from "@/hooks/use-statistics";
 import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { useCallback, useState } from "react";
+import { Pressable, ScrollView, StyleSheet } from "react-native";
 import PieChart from "react-native-pie-chart";
+import { IconSymbol } from "../icon-symbol";
+import { RangeSelectionModal } from "./range-selection";
+
+function FilterButton({ toggleFilter }: { toggleFilter: () => void }) {
+  return (
+    <Pressable style={{ marginTop: 36 }} onPress={toggleFilter}>
+      <IconSymbol name="fuel.filter.water" size={24} color="#F2F2F2" />
+    </Pressable>
+  );
+}
 
 function PaymentLegend({ method, color }: { method: string; color: string }) {
   return (
@@ -19,13 +29,25 @@ function PaymentLegend({ method, color }: { method: string; color: string }) {
   );
 }
 
+type StatisticDates = {
+  startDate: Date;
+  endDate: Date;
+};
+
 export default function StatisticsHome() {
   const { statistics, loading, fetchStatistics } = useStatistics();
+  const [dateRangeSelectorOpen, setDateRangeSelectorOpen] = useState(false);
+  const [selectedDates, setSelectedDates] = useState<StatisticDates>({
+    startDate: new Date(
+      new Date().getTime() - 30 * 24 * 60 * 60 * 1000, // 30 days ago
+    ),
+    endDate: new Date(),
+  });
 
   useFocusEffect(
     useCallback(() => {
-      fetchStatistics();
-    }, [fetchStatistics]),
+      fetchStatistics(selectedDates.startDate, selectedDates.endDate);
+    }, [fetchStatistics, selectedDates]),
   );
 
   if (loading) {
@@ -49,7 +71,14 @@ export default function StatisticsHome() {
   }
 
   return (
-    <ParallaxScrollView title="Statistics">
+    <ParallaxScrollView
+      title="Statistics"
+      rightSibling={
+        <FilterButton
+          toggleFilter={() => setDateRangeSelectorOpen(!dateRangeSelectorOpen)}
+        />
+      }
+    >
       <ThemedView style={styles.page}>
         <ThemedView style={styles.totalPaymentsContainer}>
           <ThemedView>
@@ -95,12 +124,16 @@ export default function StatisticsHome() {
                 <ThemedText style={styles.mediumText}>
                   {product.totalQuantity} sold
                 </ThemedText>
-                {/* <ThemedText>₱ {product.totalRevenue.toFixed(2)}</ThemedText> */}
               </ThemedView>
             ))}
           </ThemedView>
         </ScrollView>
       </ThemedView>
+      <RangeSelectionModal
+        downloadModalOpen={dateRangeSelectorOpen}
+        setDownloadModalOpen={setDateRangeSelectorOpen}
+        setDates={setSelectedDates}
+      />
     </ParallaxScrollView>
   );
 }
