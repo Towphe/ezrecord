@@ -30,7 +30,7 @@ export function TransactionCard({
       </ThemedView>
       <ThemedView style={styles.cardRow}>
         <ThemedText>
-          {createdAt.toDateString()},{" "}
+          {createdAt.toDateString()},
           {createdAt.toLocaleTimeString().substring(0, 5)}
         </ThemedText>
       </ThemedView>
