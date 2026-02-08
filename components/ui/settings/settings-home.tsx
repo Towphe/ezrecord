@@ -2,13 +2,13 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useClearData } from "@/hooks/clear-data";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Button, StyleSheet } from "react-native";
 import { RemoveDataModal } from "./remove-modal";
 
 export default function SettingsHome() {
-  const navigation = useNavigation();
+  const router = useRouter();
   const [deletedModalVisible, setDeletedModalVisible] = useState(false);
   const { clearData } = useClearData();
 
@@ -16,9 +16,11 @@ export default function SettingsHome() {
     await clearData();
     setDeletedModalVisible(false);
 
-    navigation.navigate({
-      name: "StatisticsHome",
-    } as never);
+    // go to statistics home found in separate screen stack to avoid issues with resetting the navigation state after clearing data
+    // navigation.navigate({
+    //   name: "StatisticsHome",
+    // } as never);
+    router.navigate("/");
   };
 
   return (
