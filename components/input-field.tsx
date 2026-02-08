@@ -42,15 +42,17 @@ export function InputField({
               placeholder={placeholder}
               onBlur={onBlur}
               value={value == null ? "" : String(value)}
-              onChangeText={(text) =>
-                onChange(
-                  fieldType === "number"
-                    ? text === ""
-                      ? undefined
-                      : Number(text)
-                    : text,
-                )
-              }
+              onChangeText={(text) => {
+                if (fieldType === "number") {
+                  if (text === "") {
+                    onChange("");
+                  } else {
+                    onChange(Number(text));
+                  }
+                } else {
+                  onChange(text);
+                }
+              }}
               placeholderTextColor="#999"
               editable={!disabled}
               autoCapitalize={fieldType === "number" ? "none" : "words"}
