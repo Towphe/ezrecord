@@ -62,7 +62,6 @@ export function useTransactions() {
           );
         }
       } catch (err) {
-        console.log("Error fetching transactions:", err);
         console.error(err);
       } finally {
         setLoading(false);

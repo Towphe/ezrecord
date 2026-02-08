@@ -72,8 +72,7 @@ export function EditProduct({
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     try {
-      const updated = await editProduct(data);
-      console.log("Edited Product", updated ?? data);
+      await editProduct(data);
     } catch (err) {
       console.error("Failed to edit product", err);
     }

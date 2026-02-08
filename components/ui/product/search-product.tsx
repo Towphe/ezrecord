@@ -21,7 +21,6 @@ export function SearchProduct({ onSearch }: Props) {
   });
 
   const onSubmit = ({ name }: z.infer<typeof schema>) => {
-    console.log(`Searching for product: ${name}`);
     onSearch(name);
   };
 

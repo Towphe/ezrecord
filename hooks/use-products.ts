@@ -43,9 +43,6 @@ export function useProducts() {
           .orderBy(schema.product.createdAt)
           .limit(limit ?? DEFAULT_LIMIT);
 
-        console.log(`name: ${name}, limit: ${limit}, after: ${after}`);
-        console.log(data);
-
         if (after) {
           setProducts((products) => [
             ...products,
@@ -65,7 +62,6 @@ export function useProducts() {
           );
         }
       } catch (err) {
-        console.log("Error fetching products:", err);
         console.error(err);
       } finally {
         setLoading(false);

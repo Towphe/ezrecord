@@ -40,7 +40,6 @@ async function saveToGallery(tag: string) {
 
   try {
     await CameraRoll.save(tag, { type: "photo" });
-    console.log("Success! Image is in the gallery.");
   } catch (error) {
     console.error("Save failed:", error);
   }
@@ -86,10 +85,6 @@ export default function EReceiptCapture({
 
       for (const obj of detectedObjects) {
         const text = await extractText(obj.croppedPath);
-
-        console.log(
-          `Detected class ${obj.classId} with text: ${text} (confidence: ${obj.confidence})`,
-        );
 
         switch (obj.classId) {
           case 0:

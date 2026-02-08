@@ -26,7 +26,6 @@ export function useProduct(productId: string) {
 
       setProduct(data[0] || null);
     } catch (err) {
-      console.log("Error fetching products:", err);
       console.error(err);
     } finally {
       setLoading(false);

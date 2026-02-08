@@ -29,8 +29,6 @@ export function useDeleteProduct(productId: string) {
         .where(eq(schema.product.productId, productId))
         .returning();
 
-      console.log(result);
-
       return result;
     } catch (err) {
       console.error(err);

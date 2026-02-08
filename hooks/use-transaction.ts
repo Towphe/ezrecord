@@ -68,7 +68,6 @@ export function useTransaction(transactionId: string) {
         })),
       );
     } catch (err) {
-      console.log("Error fetching transactions:", err);
       console.error(err);
     } finally {
       setLoading(false);
