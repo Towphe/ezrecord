@@ -3,6 +3,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { METHOD_COLORS } from "@/constants/statistics";
 import { useStatistics } from "@/hooks/use-statistics";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import PieChart from "react-native-pie-chart";
 
@@ -18,7 +20,13 @@ function PaymentLegend({ method, color }: { method: string; color: string }) {
 }
 
 export default function StatisticsHome() {
-  const { statistics, loading } = useStatistics();
+  const { statistics, loading, fetchStatistics } = useStatistics();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchStatistics();
+    }, [fetchStatistics]),
+  );
 
   if (loading) {
     return (
@@ -32,7 +40,7 @@ export default function StatisticsHome() {
     return (
       <ParallaxScrollView title="Statistics">
         <ThemedView style={styles.page}>
-          <ThemedText style={styles.mediumText}>
+          <ThemedText style={{ marginTop: 32 }}>
             No payments in the last 30 days.
           </ThemedText>
         </ThemedView>
