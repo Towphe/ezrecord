@@ -155,9 +155,18 @@ export default function CaptureHome({
 
   if (!productLoading && products.length === 0) {
     return (
-      <ParallaxScrollView title="Capture">
+      <ParallaxScrollView
+        title="Capture"
+        rightSibling={
+          <CheckoutButton
+            selectedProducts={selectedProducts}
+            onCheckoutPress={handleCheckout}
+          />
+        }
+      >
         <ThemedView style={styles.page}>
           <ThemedText style={{ marginTop: 32 }}>No products found.</ThemedText>
+          <SearchProduct onSearch={handleSearch} />
         </ThemedView>
       </ParallaxScrollView>
     );
