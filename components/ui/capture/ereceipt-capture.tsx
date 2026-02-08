@@ -2,7 +2,6 @@ import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import { CameraScreen } from "@/components/camera-screen";
 import { Payment, UntreatedPayment } from "@/types/payment";
 import { extractText, locatePaymentFields } from "@/utils/photoProcessor";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState } from "react";
 import {
@@ -30,19 +29,6 @@ async function hasAndroidPermission() {
 
   const status = await PermissionsAndroid.request(permission);
   return status === "granted";
-}
-
-async function saveToGallery(tag: string) {
-  // 'tag' is the local URI of the cropped image
-  if (Platform.OS === "android" && !(await hasAndroidPermission())) {
-    return;
-  }
-
-  try {
-    await CameraRoll.save(tag, { type: "photo" });
-  } catch (error) {
-    console.error("Save failed:", error);
-  }
 }
 
 export default function EReceiptCapture({
