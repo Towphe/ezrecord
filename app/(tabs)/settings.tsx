@@ -1,23 +1,20 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { StyleSheet } from "react-native";
+import SettingsHome from "@/components/ui/settings/settings-home";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+export type SettingsStackParamList = {
+  SettingsHome: undefined;
+};
+
+const SettingsScreenStack =
+  createNativeStackNavigator<SettingsStackParamList>();
 
 export default function SettingsScreen() {
   return (
-    <ParallaxScrollView title="Settings">
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Settings</ThemedText>
-      </ThemedView>
-      {/* <ThemedView style={styles.stepContainer}></ThemedView> */}
-    </ParallaxScrollView>
+    <SettingsScreenStack.Navigator screenOptions={{ headerShown: false }}>
+      <SettingsScreenStack.Screen
+        name="SettingsHome"
+        component={SettingsHome}
+      />
+    </SettingsScreenStack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-});

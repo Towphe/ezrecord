@@ -28,6 +28,18 @@ export default function StatisticsHome() {
     );
   }
 
+  if (!loading && statistics?.totalPayments === 0) {
+    return (
+      <ParallaxScrollView title="Statistics">
+        <ThemedView style={styles.page}>
+          <ThemedText style={styles.mediumText}>
+            No payments in the last 30 days.
+          </ThemedText>
+        </ThemedView>
+      </ParallaxScrollView>
+    );
+  }
+
   return (
     <ParallaxScrollView title="Statistics">
       <ThemedView style={styles.page}>
