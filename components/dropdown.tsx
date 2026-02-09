@@ -44,6 +44,7 @@ type DropdownFieldProps = {
   labelStyle?: object;
   defaultValue?: any;
   disabled?: boolean;
+  onValueChange?: (value: any) => void;
 };
 
 export function DropdownField({
@@ -56,6 +57,7 @@ export function DropdownField({
   labelStyle,
   defaultValue,
   disabled = false,
+  onValueChange,
 }: DropdownFieldProps) {
   return (
     <ThemedView>
@@ -69,7 +71,10 @@ export function DropdownField({
             return (
               <Dropdown
                 options={items}
-                onChange={onChange}
+                onChange={() => {
+                  onChange(value);
+                  onValueChange && onValueChange(value);
+                }}
                 value={value}
                 placeHolder={defaultValue}
                 style={inputStyle}

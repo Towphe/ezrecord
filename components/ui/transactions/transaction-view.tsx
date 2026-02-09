@@ -94,7 +94,10 @@ export default function TransactionView({
   };
 
   const handleEditTransaction = () => {
-    // TODO: Implement edit transaction functionality
+    navigation.navigate({
+      name: "EditTransaction",
+      params: { transaction: transaction! },
+    } as never);
   };
 
   const navigateHome = () => navigation.navigate("TransactionsHome" as never);
@@ -207,13 +210,13 @@ export default function TransactionView({
             onPress={() => setMoreActionsOpen(false)}
           >
             <ThemedView style={styles.actionsModal}>
-              {/* <Button
+              <Button
                 title="Edit Product"
                 color="#333"
                 backgroundColor="white"
                 buttonStyles={styles.buttonStyle}
                 onPress={handleEditTransaction}
-              /> */}
+              />
               <Button
                 title="Delete Product"
                 color="red"

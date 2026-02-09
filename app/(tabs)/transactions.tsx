@@ -1,10 +1,13 @@
+import { EditTransaction } from "@/components/ui/transactions/edit-transaction";
 import TransactionsHome from "@/components/ui/transactions/transaction-home";
 import TransactionView from "@/components/ui/transactions/transaction-view";
+import { Transaction } from "@/types/transaction";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 export type TransactionsStackParamList = {
   TransactionsHome: undefined;
   TransactionView: { transactionId: string };
+  EditTransaction: { transaction: Transaction };
 };
 
 const TransactionScreenStack =
@@ -16,6 +19,11 @@ export default function TransactionScreen() {
       <TransactionScreenStack.Screen
         name="TransactionsHome"
         component={TransactionsHome}
+        options={{ animation: "none" }}
+      />
+      <TransactionScreenStack.Screen
+        name="EditTransaction"
+        component={EditTransaction}
         options={{ animation: "none" }}
       />
       <TransactionScreenStack.Screen

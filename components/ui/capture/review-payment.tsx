@@ -190,7 +190,7 @@ export default function ReviewPayment({
             fieldName="paymentType"
             label="Payment Type (not automatically detected)"
             control={control}
-            defaultValue={"gcash"}
+            defaultValue={{}}
             items={paymentTypes}
             disabled={!isEditing}
             containerStyle={styles.dropdownField}
