@@ -128,6 +128,16 @@ export default function CaptureHome({
   };
 
   const handleCheckout = () => {
+    if (selectedProducts.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "No products selected",
+        text2:
+          "Please add at least one product to the order before checking out.",
+      });
+      return;
+    }
+
     navigation.navigate({
       name: "ReviewOrder",
       params: { selectedProducts: selectedProducts },
