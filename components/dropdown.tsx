@@ -71,9 +71,9 @@ export function DropdownField({
             return (
               <Dropdown
                 options={items}
-                onChange={() => {
-                  onChange(value);
-                  onValueChange && onValueChange(value);
+                onChange={(v) => {
+                  onChange(v);
+                  onValueChange && onValueChange(v);
                 }}
                 value={value}
                 placeHolder={defaultValue}

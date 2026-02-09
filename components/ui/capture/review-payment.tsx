@@ -120,19 +120,28 @@ export default function ReviewPayment({
       return;
     }
 
-    await createTransaction({
-      transactionId: transactionId,
-      selectedProducts: selectedProducts,
-      totalAmount: totalAmount,
-      paymentMethod: data.paymentType,
-      paymentInfo: {
-        name: null,
-        accountNumber: null,
-        referenceNumber: data.referenceNumber,
-        amount: data.amount,
-      },
-      receiptImageUri: receiptImageUri,
-    });
+    try {
+      await createTransaction({
+        transactionId: transactionId,
+        selectedProducts: selectedProducts,
+        totalAmount: totalAmount,
+        paymentMethod: data.paymentType,
+        paymentInfo: {
+          name: null,
+          accountNumber: null,
+          referenceNumber: data.referenceNumber,
+          amount: data.amount,
+        },
+        receiptImageUri: receiptImageUri,
+      });
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Transaction Failed",
+        text2: `An error occurred while creating the transaction.`,
+      });
+      return;
+    }
 
     navigateHome();
   };
@@ -146,6 +155,7 @@ export default function ReviewPayment({
     defaultValues: {
       amount: paymentDetails.amount,
       referenceNumber: paymentDetails.referenceNumber,
+      paymentType: "gcash" as const,
     },
   });
 
