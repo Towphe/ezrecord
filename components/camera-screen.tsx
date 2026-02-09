@@ -67,6 +67,9 @@ export function CameraScreen({
 
   return (
     <View style={styles.container}>
+      <View style={styles.overlay}>
+        <Text></Text>
+      </View>
       <Camera
         ref={camera}
         style={StyleSheet.absoluteFillObject}
@@ -95,6 +98,7 @@ const styles = StyleSheet.create({
     bottom: 50,
     alignSelf: "center",
     alignItems: "center",
+    zIndex: 9999,
   },
   captureButton: {
     width: 70,
@@ -120,4 +124,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   text: { color: "white", fontWeight: "bold" },
+  overlay: {
+    position: "absolute",
+    zIndex: 9998,
+    left: "5%",
+    top: "10%",
+    borderWidth: 5,
+    borderColor: "#edededff",
+    height: "80%",
+    width: "90%",
+  },
 });
