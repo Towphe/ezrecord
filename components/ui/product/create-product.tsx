@@ -1,5 +1,6 @@
 import { InputField } from "@/components/input-field";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ReturnButton } from "@/components/return-button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
@@ -25,7 +26,7 @@ export function CreateProduct() {
   const { createProduct } = useCreateProduct();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-  const navigateToHome = () =>
+  const navigateHome = () =>
     navigation.navigate({
       name: "ProductsHome",
     } as never);
@@ -55,11 +56,14 @@ export function CreateProduct() {
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     createProduct(data);
-    navigateToHome();
+    navigateHome();
   };
 
   return (
-    <ParallaxScrollView title="Products">
+    <ParallaxScrollView
+      leftSibling={<ReturnButton onPress={handleCancel} />}
+      title="Products"
+    >
       <ThemedView style={{ flex: 1, justifyContent: "space-between" }}>
         <KeyboardAvoidingView style={styles.form} behavior="height">
           <InputField

@@ -1,5 +1,6 @@
 import { TransactionsStackParamList } from "@/app/(tabs)/transactions";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ReturnButton } from "@/components/return-button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDeleteTransaction } from "@/hooks/delete-transaction";
@@ -96,14 +97,17 @@ export default function TransactionView({
     // TODO: Implement edit transaction functionality
   };
 
+  const navigateHome = () => navigation.navigate("TransactionsHome" as never);
+
   const handleConfirmDeleteTransaction = async () => {
     await deleteTransaction();
     setDeleteConfirmationOpen(false);
-    navigation.navigate("TransactionsHome" as never);
+    navigateHome();
   };
 
   return (
     <ParallaxScrollView
+      leftSibling={<ReturnButton onPress={navigateHome} />}
       title="Transactions"
       rightSibling={
         <MoreActionsButton onPress={() => setMoreActionsOpen(true)} />

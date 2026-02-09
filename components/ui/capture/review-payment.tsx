@@ -2,6 +2,7 @@ import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import { DropdownField } from "@/components/dropdown";
 import { InputField } from "@/components/input-field";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ReturnButton } from "@/components/return-button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
@@ -101,6 +102,8 @@ export default function ReviewPayment({
     } as never);
   };
 
+  const navigateHome = () => navigation.navigate("CaptureHome" as never);
+
   const confirmPayment = async (data: z.infer<typeof schema>) => {
     if (data.amount === null || data.amount < totalAmount) {
       Toast.show({
@@ -125,7 +128,7 @@ export default function ReviewPayment({
       receiptImageUri: receiptImageUri,
     });
 
-    navigation.navigate("CaptureHome" as never);
+    navigateHome();
   };
 
   const {
@@ -152,6 +155,7 @@ export default function ReviewPayment({
 
   return (
     <ParallaxScrollView
+      leftSibling={<ReturnButton onPress={navigateHome} />}
       title="Products"
       rightSibling={
         <EditButton isEditing={isEditing} setIsEditing={setIsEditing} />

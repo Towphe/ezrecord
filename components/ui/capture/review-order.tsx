@@ -1,5 +1,6 @@
 import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ReturnButton } from "@/components/return-button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
@@ -35,6 +36,16 @@ export default function ReviewOrder({
   const [cameraLoading, setCameraLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
+  const navigateHome = () => {
+    navigation.navigate({
+      name: "CaptureHome",
+      params: {
+        selectedProducts: selectedProducts,
+        totalAmount: total,
+      },
+    } as never);
+  };
+
   const handleEPayment = () => {
     setCameraLoading(true);
 
@@ -68,13 +79,7 @@ export default function ReviewOrder({
     });
 
     setConfirmCashPaymentModalOpen(false);
-    navigation.navigate({
-      name: "CaptureHome",
-      params: {
-        selectedProducts: selectedProducts,
-        totalAmount: total,
-      },
-    } as never);
+    navigateHome();
   };
 
   useFocusEffect(() => {
@@ -82,7 +87,10 @@ export default function ReviewOrder({
   });
 
   return (
-    <ParallaxScrollView title="Capture">
+    <ParallaxScrollView
+      leftSibling={<ReturnButton onPress={() => navigateHome()} />}
+      title="Capture"
+    >
       <ThemedView style={styles.page}>
         <ThemedView style={styles.productsContainer}>
           {selectedProducts.map((product) => (

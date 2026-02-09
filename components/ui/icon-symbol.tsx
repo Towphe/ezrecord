@@ -34,6 +34,7 @@ const MAPPING = {
   calendar: "date-range",
   gear: "settings",
   "fuel.filter.water": "filter-list",
+  "arrow.left": "arrow-back",
 } as unknown as IconMapping;
 
 /**
