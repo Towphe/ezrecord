@@ -14,6 +14,7 @@ type InputFieldProps = {
   inputStyle?: object;
   defaultValue?: any;
   disabled?: boolean;
+  onValueChange?: (value: any) => void;
 };
 
 export function InputField({
@@ -27,6 +28,7 @@ export function InputField({
   inputStyle,
   defaultValue,
   disabled = false,
+  onValueChange,
 }: InputFieldProps) {
   return (
     <ThemedView style={[containerStyle]}>
@@ -49,8 +51,12 @@ export function InputField({
                   } else {
                     onChange(Number(text));
                   }
+
+                  onValueChange &&
+                    onValueChange(text === "" ? "" : Number(text));
                 } else {
                   onChange(text);
+                  onValueChange && onValueChange(text);
                 }
               }}
               placeholderTextColor="#999"
