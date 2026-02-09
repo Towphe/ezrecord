@@ -2,11 +2,14 @@ import { TransactionsStackParamList } from "@/app/(tabs)/transactions";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useDeleteTransaction } from "@/hooks/delete-transaction";
 import { useTransaction } from "@/hooks/use-transaction";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Image, Modal, Pressable, ScrollView, StyleSheet } from "react-native";
 import { ProductItem } from "../capture/item-card";
+import { Button } from "../generic/button";
+import { CancelModal } from "../generic/cancel-modal";
 import { IconSymbol } from "../icon-symbol";
 
 const transactionTypeMap: Record<string, string> = {
@@ -46,6 +49,14 @@ function ExitImageViewButton({ setImageViewOpen }: ExitImageViewButtonProps) {
   );
 }
 
+function MoreActionsButton({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable style={{ marginTop: 36 }} onPress={onPress}>
+      <IconSymbol name="ellipsis" size={28} color="#F2F2F2" />
+    </Pressable>
+  );
+}
+
 export default function TransactionView({
   route,
 }: {
@@ -58,7 +69,10 @@ export default function TransactionView({
     products,
     loading: transactionLoading,
   } = useTransaction(transactionId);
+  const { deleteTransaction } = useDeleteTransaction(transactionId);
   const [imageViewOpen, setImageViewOpen] = useState(false);
+  const [moreActionsOpen, setMoreActionsOpen] = useState(false);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   useEffect(() => {
     if (!transaction && !transactionLoading) {
@@ -74,8 +88,27 @@ export default function TransactionView({
     );
   }
 
+  const handleDeleteTransaction = () => {
+    setDeleteConfirmationOpen(true);
+  };
+
+  const handleEditTransaction = () => {
+    // TODO: Implement edit transaction functionality
+  };
+
+  const handleConfirmDeleteTransaction = async () => {
+    await deleteTransaction();
+    setDeleteConfirmationOpen(false);
+    navigation.navigate("TransactionsHome" as never);
+  };
+
   return (
-    <ParallaxScrollView title="Transactions">
+    <ParallaxScrollView
+      title="Transactions"
+      rightSibling={
+        <MoreActionsButton onPress={() => setMoreActionsOpen(true)} />
+      }
+    >
       <ThemedView style={styles.page}>
         <ThemedView style={styles.productsContainer}>
           <ThemedView style={styles.header}>
@@ -157,6 +190,43 @@ export default function TransactionView({
             </Modal>
           </ThemedView>
         </ThemedView>
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={moreActionsOpen}
+          onRequestClose={() => {
+            setMoreActionsOpen(!moreActionsOpen);
+          }}
+        >
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => setMoreActionsOpen(false)}
+          >
+            <ThemedView style={styles.actionsModal}>
+              {/* <Button
+                title="Edit Product"
+                color="#333"
+                backgroundColor="white"
+                buttonStyles={styles.buttonStyle}
+                onPress={handleEditTransaction}
+              /> */}
+              <Button
+                title="Delete Product"
+                color="red"
+                backgroundColor="white"
+                buttonStyles={styles.buttonStyle}
+                onPress={handleDeleteTransaction}
+              />
+              <CancelModal
+                title="Delete Transaction"
+                subTitle="This action cannot be undone. Stocks will not be reverted."
+                cancelModalOpen={deleteConfirmationOpen}
+                setCancelModalOpen={() => setDeleteConfirmationOpen(false)}
+                onConfirmCancel={handleConfirmDeleteTransaction}
+              />
+            </ThemedView>
+          </Pressable>
+        </Modal>
       </ThemedView>
     </ParallaxScrollView>
   );
@@ -214,5 +284,28 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  actionsModal: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    position: "absolute",
+    backgroundColor: "#33333331",
+    bottom: 0,
+    paddingBottom: 80,
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    gap: 6,
+  },
+  buttonStyle: {
+    padding: 12,
+    width: "85%",
+    borderRadius: 4,
+    alignItems: "center",
+    shadowColor: "#333",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 2.5,
   },
 });
