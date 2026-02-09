@@ -10,10 +10,12 @@ import { useCreateTransaction } from "@/hooks/create-transaction";
 import { useFindTransactionByReference } from "@/hooks/find-transaction-by-ref";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -82,6 +84,7 @@ export default function ReviewPayment({
   const [referenceNumber, setReferenceNumber] = useState(
     paymentDetails.referenceNumber || undefined,
   );
+  const [cameraLoading, setCameraLoading] = useState(false);
   const { transaction: existingTransaction } =
     useFindTransactionByReference(referenceNumber);
 
@@ -169,6 +172,24 @@ export default function ReviewPayment({
     return unsubscribe;
   }, [navigation]);
 
+  const handleCameraRedirect = () => {
+    setCameraLoading(true);
+
+    setTimeout(() => {
+      navigation.navigate({
+        name: "EReceiptCapture",
+        params: {
+          selectedProducts: selectedProducts,
+          totalAmount: totalAmount,
+        },
+      } as never);
+    }, 10);
+  };
+
+  useFocusEffect(() => {
+    setCameraLoading(false);
+  });
+
   return (
     <ParallaxScrollView
       leftSibling={<ReturnButton onPress={navigateHome} />}
@@ -235,10 +256,23 @@ export default function ReviewPayment({
             title="Rescan"
             backgroundColor={Colors.teal}
             buttonStyles={styles.buttonStyle}
-            onPress={() => redirectToScan()}
+            onPress={handleCameraRedirect}
           />
         </ThemedView>
       </ThemedView>
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={cameraLoading}
+        onRequestClose={() => {
+          setCameraLoading(false);
+        }}
+      >
+        <ThemedView style={styles.modal}>
+          <IconSymbol name="camera" size={64} color={Colors.teal} />
+          <ThemedText style={{ fontSize: 20 }}>Loading Camera...</ThemedText>
+        </ThemedView>
+      </Modal>
       <CancelModal
         title="Confirm Cancellation"
         subTitle="This action cannot be undone."
@@ -292,5 +326,16 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 4,
     alignItems: "center",
+  },
+  modal: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: "column",
+    justifyContent: "center",
+    backgroundColor: "#F2F2F2",
+    bottom: 0,
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    gap: 6,
   },
 });
