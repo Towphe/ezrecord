@@ -3,7 +3,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { METHOD_COLORS } from "@/constants/statistics";
 import { useStatistics } from "@/hooks/use-statistics";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet } from "react-native";
 import PieChart from "react-native-pie-chart";
@@ -37,16 +37,23 @@ type StatisticDates = {
 export default function StatisticsHome() {
   const { statistics, loading, fetchStatistics } = useStatistics();
   const [dateRangeSelectorOpen, setDateRangeSelectorOpen] = useState(false);
-  const [selectedDates, setSelectedDates] = useState<StatisticDates>({
-    startDate: new Date(
-      new Date().getTime() - 30 * 24 * 60 * 60 * 1000, // 30 days ago
-    ),
-    endDate: new Date(),
-  });
+  const [selectedDates, setSelectedDates] = useState<StatisticDates | null>(
+    null,
+  );
 
   useFocusEffect(
     useCallback(() => {
-      fetchStatistics(selectedDates.startDate, selectedDates.endDate);
+      const now = new Date();
+      console.log(now);
+      const defaultDates: StatisticDates = {
+        startDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+        endDate: now,
+      };
+
+      const datesToUse = selectedDates ?? defaultDates;
+      console.log("Fetching statistics for dates:", datesToUse);
+
+      fetchStatistics(datesToUse.startDate, datesToUse.endDate);
     }, [fetchStatistics, selectedDates]),
   );
 
@@ -76,8 +83,15 @@ export default function StatisticsHome() {
               No payments found in time range
             </ThemedText>
             <ThemedText style={{ opacity: 0.6, textAlign: "center" }}>
-              ({selectedDates.startDate.toLocaleDateString()} -{" "}
-              {selectedDates.endDate.toLocaleDateString()}).
+              {(() => {
+                const now = new Date();
+                const defaultDates: StatisticDates = {
+                  startDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+                  endDate: now,
+                };
+                const shown = selectedDates ?? defaultDates;
+                return `(${shown.startDate.toLocaleDateString()} - ${shown.endDate.toLocaleDateString()}).`;
+              })()}
             </ThemedText>
           </ThemedView>
         </ThemedView>

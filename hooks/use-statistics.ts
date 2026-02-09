@@ -140,12 +140,7 @@ export function useStatistics() {
     [drizzleDb],
   );
 
-  useEffect(() => {
-    fetchStatistics(
-      new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
-      new Date(),
-    );
-  }, [fetchStatistics]);
+  useEffect(() => {}, []);
 
   return { statistics, loading, fetchStatistics };
 }
