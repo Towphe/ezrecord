@@ -1,6 +1,6 @@
 import { DEFAULT_LIMIT } from "@/constants/limits.ts";
 import { Product } from "@/types/products.ts";
-import { and, asc, desc, eq, gt, like } from "drizzle-orm";
+import { and, asc, desc, eq, gt, like, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -38,10 +38,16 @@ export function useProducts() {
           filters.push(like(schema.product.name, `%${name}%`));
         }
 
-        if (after) {
-          filters.push(
-            gt(schema.product.createdAt, after.getTime().toString()),
-          );
+        if (after && sortBy === "dateAdded") {
+          if (sortOrder === "desc") {
+            filters.push(
+              lt(schema.product.createdAt, after.getTime().toString()),
+            );
+          } else {
+            filters.push(
+              gt(schema.product.createdAt, after.getTime().toString()),
+            );
+          }
         }
 
         switch (hasStock) {

@@ -117,11 +117,19 @@ export function ProductsHome() {
           onEndReached={() => {
             const lastProduct = products[products.length - 1];
 
-            if (lastProduct) {
+            if (!lastProduct) return;
+
+            // Only perform cursor-based pagination when sorting by dateAdded.
+            // When sorting by name we don't currently support cursor pagination,
+            // so avoid re-fetching the same items repeatedly.
+            if (filters.sortBy === "dateAdded") {
               refetch({
                 name,
                 limit: 10,
                 after: lastProduct.createdAt,
+                sortBy: filters.sortBy,
+                sortOrder: filters.sortOrder,
+                hasStock: filters.hasStock,
               });
             }
           }}

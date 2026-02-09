@@ -43,6 +43,7 @@ export default function CaptureHome({
   const navigation = useNavigation();
   const { products, loading: productLoading, refetch } = useProducts();
   const [name, setName] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "dateAdded">("name");
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
     route?.params?.selectedProducts ?? [],
   );
@@ -135,7 +136,7 @@ export default function CaptureHome({
 
   useFocusEffect(
     useCallback(() => {
-      refetch({ name, hasStock: "instock" });
+      refetch({ name, hasStock: "instock", sortBy });
     }, [name, refetch]),
   );
 
@@ -145,7 +146,7 @@ export default function CaptureHome({
 
   const handleSearch = (name: string) => {
     setName(name);
-    refetch({ name, limit: 10, hasStock: "instock" });
+    refetch({ name, limit: 10, hasStock: "instock", sortBy });
   };
 
   if (productLoading) {
@@ -200,11 +201,15 @@ export default function CaptureHome({
           onEndReached={() => {
             const lastProduct = products[products.length - 1];
 
-            if (lastProduct) {
+            if (!lastProduct) return;
+
+            if (sortBy === "dateAdded") {
               refetch({
                 name,
                 limit: 10,
                 after: lastProduct.createdAt,
+                sortBy,
+                hasStock: "instock",
               });
             }
           }}

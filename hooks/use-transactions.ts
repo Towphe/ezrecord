@@ -1,6 +1,6 @@
 import { DEFAULT_LIMIT } from "@/constants/limits.ts";
 import { Transaction } from "@/types/transaction.ts";
-import { and, asc, desc, eq, gt, like } from "drizzle-orm";
+import { and, asc, desc, eq, gt, like, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -37,9 +37,15 @@ export function useTransactions() {
         }
 
         if (after) {
-          filters.push(
-            gt(schema.transaction.createdAt, after.getTime().toString()),
-          );
+          if (sortOrder === "desc") {
+            filters.push(
+              lt(schema.transaction.createdAt, after.getTime().toString()),
+            );
+          } else {
+            filters.push(
+              gt(schema.transaction.createdAt, after.getTime().toString()),
+            );
+          }
         }
 
         if (paymentMethod !== "all") {

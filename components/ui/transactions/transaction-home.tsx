@@ -116,12 +116,14 @@ export default function TransactionsHome() {
           onEndReached={() => {
             const lastTransaction = transactions[transactions.length - 1];
 
-            if (lastTransaction) {
-              refetchTransactions({
-                transactionId,
-                after: lastTransaction.createdAt,
-              });
-            }
+            if (!lastTransaction) return;
+
+            refetchTransactions({
+              transactionId,
+              after: lastTransaction.createdAt,
+              limit: 10,
+              ...filters,
+            });
           }}
           style={styles.transactionsContainer}
           onEndReachedThreshold={0.2}
