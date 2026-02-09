@@ -7,8 +7,9 @@ import { useCreateProduct } from "@/hooks/create-product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Button, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, StyleSheet } from "react-native";
 import * as z from "zod";
+import { Button } from "../generic/button";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -91,12 +92,14 @@ export function CreateProduct() {
           <Button
             title="Create Product"
             onPress={handleSubmit(onSubmit)}
-            color={Colors.green}
+            backgroundColor={Colors.green}
+            buttonStyles={styles.buttonStyle}
           />
           <Button
             title="Cancel"
             onPress={handleCancel}
-            color={Colors.dark.background}
+            backgroundColor={Colors.dark.background}
+            buttonStyles={styles.buttonStyle}
           />
         </ThemedView>
       </ThemedView>
@@ -130,5 +133,10 @@ const styles = StyleSheet.create({
     gap: 6,
     marginHorizontal: "auto",
     width: "95%",
+  },
+  buttonStyle: {
+    padding: 12,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });

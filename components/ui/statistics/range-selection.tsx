@@ -3,7 +3,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useEffect, useState } from "react";
-import { Button, Modal, Pressable, StyleSheet } from "react-native";
+import { Modal, Pressable, StyleSheet } from "react-native";
+import { Button } from "../generic/button";
 import { IconSymbol } from "../icon-symbol";
 
 type RangeSelectionProps = {
@@ -91,8 +92,9 @@ export function RangeSelectionModal({
               <Button
                 title="Set Range"
                 onPress={handleRangeChange}
-                color={Colors.green}
+                backgroundColor={Colors.green}
                 disabled={!isDateRangeValid}
+                buttonStyles={styles.buttonStyle}
               />
             </ThemedView>
           </ThemedView>
@@ -144,5 +146,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  buttonStyle: {
+    padding: 8,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });

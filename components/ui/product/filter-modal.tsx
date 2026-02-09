@@ -4,8 +4,9 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import zodResolver from "@/utils/zodResolver";
 import { useForm } from "react-hook-form";
-import { Button, Modal, Pressable, StyleSheet } from "react-native";
+import { Modal, Pressable, StyleSheet } from "react-native";
 import * as z from "zod";
+import { Button } from "../generic/button";
 import { IconSymbol } from "../icon-symbol";
 
 const sortOptions = [
@@ -137,7 +138,8 @@ export function ProductFilterModal({
               <Button
                 title="Filter"
                 onPress={handleSubmit(applyFilter)}
-                color={Colors.teal}
+                backgroundColor={Colors.teal}
+                buttonStyles={styles.buttonStyle}
               />
             </ThemedView>
           </ThemedView>
@@ -204,5 +206,10 @@ const styles = StyleSheet.create({
   },
   dropdownInput: {
     color: "#333",
+  },
+  buttonStyle: {
+    padding: 8,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });

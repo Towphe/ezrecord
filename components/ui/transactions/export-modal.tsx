@@ -4,7 +4,8 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useExportTransactions } from "@/hooks/export-transactions";
 import { useEffect, useState } from "react";
-import { Button, Modal, Pressable, StyleSheet } from "react-native";
+import { Modal, Pressable, StyleSheet } from "react-native";
+import { Button } from "../generic/button";
 import { IconSymbol } from "../icon-symbol";
 
 type ExportModalProps = {
@@ -94,7 +95,8 @@ export function ExportModal({
               <Button
                 title="Export"
                 onPress={handleExport}
-                color={Colors.green}
+                backgroundColor={Colors.green}
+                buttonStyles={styles.buttonStyle}
                 disabled={!isDateRangeValid}
               />
             </ThemedView>
@@ -147,5 +149,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  buttonStyle: {
+    padding: 8,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });

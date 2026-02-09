@@ -11,8 +11,9 @@ import {
 } from "@react-navigation/native";
 import * as Crypto from "expo-crypto";
 import { useState } from "react";
-import { Button, Modal, StyleSheet } from "react-native";
+import { Modal, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from "../generic/button";
 import { IconSymbol } from "../icon-symbol";
 import { ConfirmCashPaymentModal } from "./confirm-cash-payment-modal";
 import { ProductItem } from "./item-card";
@@ -92,8 +93,18 @@ export default function ReviewOrder({
           <ThemedText style={styles.total}>
             Total: P {total.toFixed(2)}
           </ThemedText>
-          <Button title="E-Payment" color="teal" onPress={handleEPayment} />
-          <Button title="Cash" color="green" onPress={handleCashPayment} />
+          <Button
+            title="E-Payment"
+            backgroundColor="teal"
+            onPress={handleEPayment}
+            buttonStyles={styles.buttonStyle}
+          />
+          <Button
+            title="Cash"
+            backgroundColor="green"
+            onPress={handleCashPayment}
+            buttonStyles={styles.buttonStyle}
+          />
           <ConfirmCashPaymentModal
             isOpen={confirmCashPaymentModalOpen}
             setIsOpen={setConfirmCashPaymentModalOpen}
@@ -157,5 +168,10 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     gap: 6,
+  },
+  buttonStyle: {
+    padding: 12,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });

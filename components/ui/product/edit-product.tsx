@@ -11,8 +11,9 @@ import { RouteProp } from "@react-navigation/native";
 import { useNavigation } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, StyleSheet } from "react-native";
 import * as z from "zod";
+import { Button } from "../generic/button";
 
 const schema = z.object({
   name: z.string().optional(),
@@ -148,12 +149,14 @@ export function EditProduct({
           <Button
             title="Edit Product"
             onPress={handleSubmit(onSubmit)}
-            color={Colors.yellow}
+            backgroundColor={Colors.yellow}
+            buttonStyles={styles.buttonStyle}
           />
           <Button
             title="Cancel"
             onPress={handleCancel}
-            color={Colors.dark.background}
+            backgroundColor={Colors.dark.background}
+            buttonStyles={styles.buttonStyle}
           />
         </ThemedView>
       </ThemedView>
@@ -182,5 +185,10 @@ const styles = StyleSheet.create({
     gap: 6,
     marginHorizontal: "auto",
     width: "95%",
+  },
+  buttonStyle: {
+    padding: 12,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });
