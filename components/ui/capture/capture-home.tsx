@@ -7,7 +7,7 @@ import { SelectedProduct } from "@/types/product-selection";
 import { Product } from "@/types/products";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -138,6 +138,10 @@ export default function CaptureHome({
       refetch({ name, hasStock: "instock" });
     }, [name, refetch]),
   );
+
+  useEffect(() => {
+    setSelectedProducts([]);
+  }, []);
 
   const handleSearch = (name: string) => {
     setName(name);
