@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useCreateTransaction } from "@/hooks/create-transaction";
+import { useFindTransactionByReference } from "@/hooks/find-transaction-by-ref";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -78,6 +79,11 @@ export default function ReviewPayment({
   } = route.params;
   const [isEditing, setIsEditing] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [referenceNumber, setReferenceNumber] = useState(
+    paymentDetails.referenceNumber || undefined,
+  );
+  const { transaction: existingTransaction } =
+    useFindTransactionByReference(referenceNumber);
 
   useLayoutEffect(() => {
     // restore any parent tab bars hidden by the capture flow
@@ -174,18 +180,26 @@ export default function ReviewPayment({
             inputStyle={styles.input}
           />
           {errors.amount && <ThemedText>{errors.amount.message}</ThemedText>}
-          <InputField
-            fieldName="referenceNumber"
-            label="Reference Number"
-            control={control}
-            placeholder="Reference Number"
-            defaultValue={paymentDetails.referenceNumber}
-            disabled={!isEditing}
-            inputStyle={styles.input}
-          />
-          {errors.referenceNumber && (
-            <ThemedText>{errors.referenceNumber.message}</ThemedText>
-          )}
+          <ThemedView>
+            <InputField
+              fieldName="referenceNumber"
+              label="Reference Number"
+              control={control}
+              placeholder="Reference Number"
+              defaultValue={paymentDetails.referenceNumber}
+              disabled={!isEditing}
+              inputStyle={styles.input}
+              onValueChange={setReferenceNumber}
+            />
+            {errors.referenceNumber && (
+              <ThemedText>{errors.referenceNumber.message}</ThemedText>
+            )}
+            {existingTransaction !== null && (
+              <ThemedText style={{ color: Colors.yellow }}>
+                Warning: Reference number already exists.
+              </ThemedText>
+            )}
+          </ThemedView>
           <DropdownField
             fieldName="paymentType"
             label="Payment Type (not automatically detected)"
