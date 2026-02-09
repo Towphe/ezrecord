@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/theme";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
   calendarButton: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "teal",
+    backgroundColor: Colors.teal,
     height: "100%",
   },
 });

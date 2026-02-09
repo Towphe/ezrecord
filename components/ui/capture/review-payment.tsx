@@ -4,6 +4,7 @@ import { InputField } from "@/components/input-field";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Colors } from "@/constants/theme";
 import { useCreateTransaction } from "@/hooks/create-transaction";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
@@ -204,7 +205,7 @@ export default function ReviewPayment({
           />
           <Button
             title="Rescan"
-            backgroundColor="teal"
+            backgroundColor={Colors.teal}
             buttonStyles={styles.buttonStyle}
             onPress={() => redirectToScan()}
           />

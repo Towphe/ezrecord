@@ -95,7 +95,7 @@ export default function ReviewOrder({
           </ThemedText>
           <Button
             title="E-Payment"
-            backgroundColor="teal"
+            backgroundColor={Colors.teal}
             onPress={handleEPayment}
             buttonStyles={styles.buttonStyle}
           />
