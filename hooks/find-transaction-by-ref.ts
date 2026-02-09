@@ -40,8 +40,6 @@ export function useFindTransactionByReference(
       return null;
     }
 
-    console.log("Got pass here");
-
     setTransaction({
       ...data[0],
       createdAt: new Date(parseInt(data[0].createdAt)),
