@@ -7,10 +7,9 @@ import { ThemedView } from "@/components/themed-view";
 import { useCreateTransaction } from "@/hooks/create-transaction";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  Button,
   KeyboardAvoidingView,
   Pressable,
   StyleSheet,
@@ -18,6 +17,8 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import * as z from "zod";
+import { Button } from "../generic/button";
+import { CancelModal } from "../generic/cancel-modal";
 import { IconSymbol } from "../icon-symbol";
 
 const paymentTypes = [
@@ -74,6 +75,7 @@ export default function ReviewPayment({
     receiptImageUri,
   } = route.params;
   const [isEditing, setIsEditing] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useLayoutEffect(() => {
     // restore any parent tab bars hidden by the capture flow
@@ -137,6 +139,16 @@ export default function ReviewPayment({
     },
   });
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      e.preventDefault();
+
+      setIsCancelModalOpen(true);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <ParallaxScrollView
       title="Products"
@@ -186,16 +198,25 @@ export default function ReviewPayment({
         <ThemedView style={styles.actionButtons}>
           <Button
             title="Confirm Payment"
-            color="green"
+            backgroundColor="green"
+            buttonStyles={styles.buttonStyle}
             onPress={handleSubmit(confirmPayment)}
           />
           <Button
             title="Rescan"
-            color="teal"
+            backgroundColor="teal"
+            buttonStyles={styles.buttonStyle}
             onPress={() => redirectToScan()}
           />
         </ThemedView>
       </ThemedView>
+      <CancelModal
+        title="Confirm Cancellation"
+        subTitle="This action cannot be undone."
+        cancelModalOpen={isCancelModalOpen}
+        setCancelModalOpen={setIsCancelModalOpen}
+        onConfirmCancel={() => navigation.navigate("CaptureHome" as never)}
+      />
     </ParallaxScrollView>
   );
 }
@@ -237,5 +258,10 @@ const styles = StyleSheet.create({
   },
   dropdownInput: {
     color: "#333",
+  },
+  buttonStyle: {
+    padding: 12,
+    borderRadius: 4,
+    alignItems: "center",
   },
 });
