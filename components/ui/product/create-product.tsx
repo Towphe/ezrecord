@@ -6,10 +6,12 @@ import { Colors } from "@/constants/theme";
 import { useCreateProduct } from "@/hooks/create-product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation } from "expo-router";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
 import * as z from "zod";
 import { Button } from "../generic/button";
+import { CancelModal } from "../generic/cancel-modal";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -21,6 +23,7 @@ const schema = z.object({
 export function CreateProduct() {
   const navigation = useNavigation();
   const { createProduct } = useCreateProduct();
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const navigateToHome = () =>
     navigation.navigate({
@@ -28,8 +31,18 @@ export function CreateProduct() {
     } as never);
 
   const handleCancel = () => {
-    navigateToHome();
+    setIsCancelModalOpen(true);
   };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      e.preventDefault();
+
+      handleCancel();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const {
     control,
@@ -103,6 +116,13 @@ export function CreateProduct() {
           />
         </ThemedView>
       </ThemedView>
+      <CancelModal
+        title="Confirm Cancellation"
+        subTitle="This action cannot be undone."
+        cancelModalOpen={isCancelModalOpen}
+        setCancelModalOpen={setIsCancelModalOpen}
+        onConfirmCancel={() => navigation.navigate("ProductsHome" as never)}
+      />
     </ParallaxScrollView>
   );
 }
