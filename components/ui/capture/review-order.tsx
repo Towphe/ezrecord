@@ -2,11 +2,18 @@ import { CaptureStackParamList } from "@/app/(tabs)/capture";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Colors } from "@/constants/theme";
 import { useCreateTransaction } from "@/hooks/create-transaction";
-import { RouteProp, useNavigation } from "@react-navigation/native";
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+} from "@react-navigation/native";
 import * as Crypto from "expo-crypto";
 import { useState } from "react";
-import { Button, StyleSheet } from "react-native";
+import { Button, Modal, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IconSymbol } from "../icon-symbol";
 import { ConfirmCashPaymentModal } from "./confirm-cash-payment-modal";
 import { ProductItem } from "./item-card";
 
@@ -24,15 +31,21 @@ export default function ReviewOrder({
   );
   const [confirmCashPaymentModalOpen, setConfirmCashPaymentModalOpen] =
     useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const handleEPayment = () => {
-    navigation.navigate({
-      name: "EReceiptCapture",
-      params: {
-        selectedProducts: selectedProducts,
-        totalAmount: total,
-      },
-    } as never);
+    setCameraLoading(true);
+
+    setTimeout(() => {
+      navigation.navigate({
+        name: "EReceiptCapture",
+        params: {
+          selectedProducts: selectedProducts,
+          totalAmount: total,
+        },
+      } as never);
+    }, 10);
   };
 
   const handleCashPayment = () => {
@@ -63,6 +76,10 @@ export default function ReviewOrder({
     } as never);
   };
 
+  useFocusEffect(() => {
+    setCameraLoading(false);
+  });
+
   return (
     <ParallaxScrollView title="Capture">
       <ThemedView style={styles.page}>
@@ -84,6 +101,19 @@ export default function ReviewOrder({
           />
         </ThemedView>
       </ThemedView>
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={cameraLoading}
+        onRequestClose={() => {
+          setCameraLoading(false);
+        }}
+      >
+        <ThemedView style={styles.modal}>
+          <IconSymbol name="camera" size={64} color={Colors.teal} />
+          <ThemedText style={{ fontSize: 20 }}>Loading Camera...</ThemedText>
+        </ThemedView>
+      </Modal>
     </ParallaxScrollView>
   );
 }
@@ -116,5 +146,16 @@ const styles = StyleSheet.create({
     width: "95%",
     marginHorizontal: "auto",
     gap: 8,
+  },
+  modal: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: "column",
+    justifyContent: "center",
+    backgroundColor: "#F2F2F2",
+    bottom: 0,
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    gap: 6,
   },
 });
