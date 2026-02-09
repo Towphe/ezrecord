@@ -100,11 +100,11 @@ export default function TransactionsHome() {
 
   return (
     <ParallaxScrollView
-      leftSibling={
+      rightSibling={
         <FilterButton toggleFilter={() => setIsFilterVisible(true)} />
       }
       title="Transactions"
-      rightSibling={
+      leftSibling={
         <DownloadButton onDownloadPress={() => setDownloadModalOpen(true)} />
       }
     >

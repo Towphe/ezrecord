@@ -101,13 +101,13 @@ export function ProductsHome() {
 
   return (
     <ParallaxScrollView
-      leftSibling={
+      rightSibling={
         <FilterButton
           toggleFilter={() => setIsFilterVisible(!isFilterVisible)}
         />
       }
       title="Products"
-      rightSibling={<CreateButton handleCreatePress={handleCreatePress} />}
+      leftSibling={<CreateButton handleCreatePress={handleCreatePress} />}
     >
       <ThemedView style={styles.page}>
         <FlatList
