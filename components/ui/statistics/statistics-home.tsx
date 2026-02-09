@@ -18,13 +18,30 @@ function FilterButton({ toggleFilter }: { toggleFilter: () => void }) {
   );
 }
 
-function PaymentLegend({ method, color }: { method: string; color: string }) {
+function PaymentLegend({
+  method,
+  color,
+  count,
+  total,
+}: {
+  method: string;
+  color: string;
+  count: number;
+  total: number;
+}) {
+  if (count === 0) {
+    return null;
+  }
+
   return (
     <ThemedView style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
       <ThemedView
         style={{ width: 20, height: 20, backgroundColor: color }}
       ></ThemedView>
       <ThemedText>{method}</ThemedText>
+      <ThemedText style={{ opacity: 0.6 }}>
+        {total > 0 ? `(${((count / total) * 100).toFixed(1)}%)` : "(0%)"}
+      </ThemedText>
     </ThemedView>
   );
 }
@@ -131,11 +148,52 @@ export default function StatisticsHome() {
             series={statistics?.paymentMethods ?? []}
           />
           <ThemedView style={styles.paymentDistributionLegends}>
-            <PaymentLegend method="G-Cash" color={METHOD_COLORS.gcash} />
-            <PaymentLegend method="Maya" color={METHOD_COLORS.maya} />
-            <PaymentLegend method="BPI" color={METHOD_COLORS.bpi} />
-            <PaymentLegend method="Cash" color={METHOD_COLORS.cash} />
+            <PaymentLegend
+              method="G-Cash"
+              color={METHOD_COLORS.gcash}
+              count={
+                statistics?.paymentMethods.find(
+                  (pm) => pm.color === METHOD_COLORS.gcash,
+                )?.value ?? 0
+              }
+              total={statistics?.totalTransactions ?? 0}
+            />
+            <PaymentLegend
+              method="Maya"
+              color={METHOD_COLORS.maya}
+              count={
+                statistics?.paymentMethods.find(
+                  (pm) => pm.color === METHOD_COLORS.maya,
+                )?.value ?? 0
+              }
+              total={statistics?.totalTransactions ?? 0}
+            />
+            <PaymentLegend
+              method="BPI"
+              color={METHOD_COLORS.bpi}
+              count={
+                statistics?.paymentMethods.find(
+                  (pm) => pm.color === METHOD_COLORS.bpi,
+                )?.value ?? 0
+              }
+              total={statistics?.totalTransactions ?? 0}
+            />
+            <PaymentLegend
+              method="Cash"
+              color={METHOD_COLORS.cash}
+              count={
+                statistics?.paymentMethods.find(
+                  (pm) => pm.color === METHOD_COLORS.cash,
+                )?.value ?? 0
+              }
+              total={statistics?.totalTransactions ?? 0}
+            />
           </ThemedView>
+          <ThemedText
+            style={{ marginTop: 12, opacity: 0.6, ...styles.mediumText }}
+          >
+            Total Transactions: {statistics?.totalTransactions}
+          </ThemedText>
         </ThemedView>
         <ScrollView style={styles.topProductsContainer}>
           <ThemedText style={styles.mediumText}>Top Products</ThemedText>
@@ -201,7 +259,9 @@ const styles = StyleSheet.create({
   paymentDistributionLegends: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    marginHorizontal: "auto",
+    width: "80%",
     gap: 12,
     marginTop: 24,
   },

@@ -13,10 +13,32 @@ type Statistics = {
     name: string;
     totalQuantity: number;
   }[];
+  totalTransactions: number;
 };
 
 function mapPaymentMethodToColor(paymentMethod: string): string {
   return METHOD_COLORS[paymentMethod] || METHOD_COLORS["other"];
+}
+
+async function fetchTotalTransactions(
+  drizzleDb: ReturnType<typeof drizzle>,
+  startDate: Date,
+  endDate: Date,
+) {
+  const total = await drizzleDb
+    .select({
+      value: count(schema.transaction.transactionId),
+    })
+    .from(schema.transaction)
+    .where(
+      and(
+        eq(schema.transaction.isDeleted, 0),
+        lt(schema.transaction.createdAt, endDate.getTime().toString()),
+        gt(schema.transaction.createdAt, startDate.getTime().toString()),
+      ),
+    );
+
+  return total[0].value || 0;
 }
 
 async function fetchTotalPayments(
@@ -106,21 +128,13 @@ export function useStatistics() {
     async (startDate: Date, endDate: Date) => {
       setLoading(true);
       try {
-        const totalPayments = await fetchTotalPayments(
-          drizzleDb,
-          startDate,
-          endDate,
-        );
-        const paymentMethods = await fetchPaymentMethods(
-          drizzleDb,
-          startDate,
-          endDate,
-        );
-        const topProducts = await fetchTopProducts(
-          drizzleDb,
-          startDate,
-          endDate,
-        );
+        const [totalPayments, paymentMethods, topProducts, totalTransactions] =
+          await Promise.all([
+            fetchTotalPayments(drizzleDb, startDate, endDate),
+            fetchPaymentMethods(drizzleDb, startDate, endDate),
+            fetchTopProducts(drizzleDb, startDate, endDate),
+            fetchTotalTransactions(drizzleDb, startDate, endDate),
+          ]);
 
         setStatistics({
           totalPayments: totalPayments,
@@ -132,6 +146,7 @@ export function useStatistics() {
               ? parseFloat(product.totalQuantity.toString())
               : 0,
           })),
+          totalTransactions: totalTransactions,
         });
       } finally {
         setLoading(false);
