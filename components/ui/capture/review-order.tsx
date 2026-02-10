@@ -11,7 +11,7 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import * as Crypto from "expo-crypto";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "../generic/button";
@@ -35,19 +35,29 @@ export default function ReviewOrder({
     useState(false);
   const [cameraLoading, setCameraLoading] = useState(false);
   const insets = useSafeAreaInsets();
+  const isConfirmClickedRef = useRef(false);
 
   const navigateHome = (params?: any) => {
     if (params) {
       navigation.reset({
         index: 0,
-        name: "CaptureHome",
-        params: params,
+        routes: [
+          {
+            name: "CaptureHome",
+            params: params,
+          },
+        ],
       } as never);
       return;
     } else {
       navigation.reset({
         index: 0,
-        name: "CaptureHome",
+        routes: [
+          {
+            name: "CaptureHome",
+            params: { selectedProducts: [] },
+          },
+        ],
       } as never);
     }
   };
@@ -84,6 +94,7 @@ export default function ReviewOrder({
       },
     });
 
+    isConfirmClickedRef.current = true;
     setConfirmCashPaymentModalOpen(false);
     navigateHome();
   };
@@ -96,12 +107,8 @@ export default function ReviewOrder({
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
       const actionType = e.data?.action?.type;
 
-      if (actionType === "GO_BACK" || actionType === "POP") {
-        e.preventDefault();
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "CaptureHome" as never }],
-        });
+      if (isConfirmClickedRef.current === true) {
+        isConfirmClickedRef.current = false;
         return;
       }
     });
