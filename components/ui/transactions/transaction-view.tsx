@@ -211,14 +211,14 @@ export default function TransactionView({
           >
             <ThemedView style={styles.actionsModal}>
               <Button
-                title="Edit Product"
+                title="Edit Transaction"
                 color="#333"
                 backgroundColor="white"
                 buttonStyles={styles.buttonStyle}
                 onPress={handleEditTransaction}
               />
               <Button
-                title="Delete Product"
+                title="Delete Transaction"
                 color="red"
                 backgroundColor="white"
                 buttonStyles={styles.buttonStyle}
