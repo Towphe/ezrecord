@@ -166,7 +166,7 @@ export default function TransactionView({
           <ThemedView
             style={{
               ...styles.paymentDetailsRow,
-              display: transaction?.receiptImageUri ? "flex" : "none",
+              display: transaction?.referenceNumber ? "flex" : "none",
             }}
           >
             <ThemedText style={{ ...styles.mediumFont, opacity: 0.6 }}>
@@ -194,7 +194,10 @@ export default function TransactionView({
                 name="eye"
                 size={18}
                 color="#33333388"
-                style={{ marginLeft: 4 }}
+                style={{
+                  marginLeft: 4,
+                  display: transaction?.receiptImageUri ? "flex" : "none",
+                }}
               />
             </Pressable>
 
