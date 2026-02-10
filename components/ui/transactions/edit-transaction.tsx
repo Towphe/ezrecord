@@ -83,7 +83,7 @@ export function EditTransaction({
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     try {
-      await editTransaction(data);
+      await editTransaction({ ...data, paymentMethod: currentPaymentMethod });
       isConfirmClickedRef.current = true;
     } catch (err) {
       isConfirmClickedRef.current = false;
