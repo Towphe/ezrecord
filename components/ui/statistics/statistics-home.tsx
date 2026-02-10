@@ -61,14 +61,12 @@ export default function StatisticsHome() {
   useFocusEffect(
     useCallback(() => {
       const now = new Date();
-      console.log(now);
       const defaultDates: StatisticDates = {
         startDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
         endDate: now,
       };
 
       const datesToUse = selectedDates ?? defaultDates;
-      console.log("Fetching statistics for dates:", datesToUse);
 
       fetchStatistics(datesToUse.startDate, datesToUse.endDate);
     }, [fetchStatistics, selectedDates]),

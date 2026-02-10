@@ -18,10 +18,6 @@ export function useFindTransactionByReference(
       return null;
     }
 
-    console.log(
-      `Fetching transaction with reference number: ${referenceNumber}`,
-    );
-
     const data = await drizzleDb
       .select()
       .from(schema.transaction)
@@ -31,8 +27,6 @@ export function useFindTransactionByReference(
           eq(schema.transaction.isDeleted, 0),
         ),
       );
-
-    console.log(data);
 
     if (!data || (data as []).length === 0) {
       setTransaction(null);
