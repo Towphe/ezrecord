@@ -11,9 +11,10 @@ import { useEditTransaction } from "@/hooks/edit-transaction";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp } from "@react-navigation/native";
 import { useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
 import * as z from "zod";
 import { Button } from "../generic/button";
 import { CancelModal } from "../generic/cancel-modal";
@@ -35,11 +36,18 @@ export function EditTransaction({
   const [currentPaymentMethod, setCurrentPaymentMethod] = useState(
     transaction.paymentMethod,
   );
+  const isConfirmClickedRef = useRef(false);
 
   const navigateToHome = () =>
-    navigation.navigate({
-      name: "TransactionsHome",
-    } as never);
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: "TransactionView" as never,
+          params: { transactionId: transaction.transactionId },
+        },
+      ],
+    });
 
   const handleCancel = () => {
     setIsCancelModalOpen(true);
@@ -47,6 +55,11 @@ export function EditTransaction({
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (isConfirmClickedRef.current === true) {
+        isConfirmClickedRef.current = false;
+        return;
+      }
+
       e.preventDefault();
 
       handleCancel();
@@ -71,8 +84,14 @@ export function EditTransaction({
   const onSubmit = async (data: z.infer<typeof schema>) => {
     try {
       await editTransaction(data);
+      isConfirmClickedRef.current = true;
     } catch (err) {
-      console.error("Failed to edit transaction", err);
+      isConfirmClickedRef.current = false;
+      Toast.show({
+        type: "error",
+        text1: "Error editing transaction",
+      });
+      return;
     }
 
     navigateToHome();
@@ -138,7 +157,10 @@ export function EditTransaction({
         subTitle="This action cannot be undone."
         cancelModalOpen={isCancelModalOpen}
         setCancelModalOpen={setIsCancelModalOpen}
-        onConfirmCancel={navigateToHome}
+        onConfirmCancel={() => {
+          isConfirmClickedRef.current = true;
+          navigateToHome();
+        }}
       />
     </ParallaxScrollView>
   );

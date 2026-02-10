@@ -113,15 +113,17 @@ export function ProductsHome() {
         <FlatList
           data={products}
           keyExtractor={(item) => item.productId}
-          renderItem={({ item }) => <ProductCard {...item} />}
+          renderItem={({ item }) => (
+            <ProductCard
+              {...item}
+              onDeleted={() => refetch({ name, ...filters })}
+            />
+          )}
           onEndReached={() => {
             const lastProduct = products[products.length - 1];
 
             if (!lastProduct) return;
 
-            // Only perform cursor-based pagination when sorting by dateAdded.
-            // When sorting by name we don't currently support cursor pagination,
-            // so avoid re-fetching the same items repeatedly.
             if (filters.sortBy === "dateAdded") {
               refetch({
                 name,

@@ -11,7 +11,7 @@ import { useFindTransactionByReference } from "@/hooks/find-transaction-by-ref";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "expo-router";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
@@ -87,6 +87,7 @@ export default function ReviewPayment({
   const [cameraLoading, setCameraLoading] = useState(false);
   const { transaction: existingTransaction } =
     useFindTransactionByReference(referenceNumber);
+  const isConfirmClickedRef = useRef(false);
 
   useLayoutEffect(() => {
     // restore any parent tab bars hidden by the capture flow
@@ -111,7 +112,12 @@ export default function ReviewPayment({
     } as never);
   };
 
-  const navigateHome = () => navigation.navigate("CaptureHome" as never);
+  // const navigateHome = () => navigation.navigate("CaptureHome" as never);
+  const navigateHome = () =>
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "CaptureHome" as never }],
+    });
 
   const confirmPayment = async (data: z.infer<typeof schema>) => {
     if (data.amount === null || data.amount < totalAmount) {
@@ -137,12 +143,14 @@ export default function ReviewPayment({
         },
         receiptImageUri: receiptImageUri,
       });
+      isConfirmClickedRef.current = true;
     } catch (err) {
       Toast.show({
         type: "error",
         text1: "Transaction Failed",
         text2: `An error occurred while creating the transaction.`,
       });
+      isConfirmClickedRef.current = false;
       return;
     }
 
@@ -164,6 +172,11 @@ export default function ReviewPayment({
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (isConfirmClickedRef.current === true) {
+        isConfirmClickedRef.current = false;
+        return;
+      }
+
       e.preventDefault();
 
       setIsCancelModalOpen(true);
@@ -278,7 +291,10 @@ export default function ReviewPayment({
         subTitle="This action cannot be undone."
         cancelModalOpen={isCancelModalOpen}
         setCancelModalOpen={setIsCancelModalOpen}
-        onConfirmCancel={() => navigation.navigate("CaptureHome" as never)}
+        onConfirmCancel={() => {
+          isConfirmClickedRef.current = true;
+          navigateHome();
+        }}
       />
     </ParallaxScrollView>
   );

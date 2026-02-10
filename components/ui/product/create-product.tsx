@@ -6,10 +6,11 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useCreateProduct } from "@/hooks/create-product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
 import * as z from "zod";
 import { Button } from "../generic/button";
 import { CancelModal } from "../generic/cancel-modal";
@@ -25,11 +26,13 @@ export function CreateProduct() {
   const navigation = useNavigation();
   const { createProduct } = useCreateProduct();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const isConfirmClickedRef = useRef(false);
 
   const navigateHome = () =>
-    navigation.navigate({
-      name: "ProductsHome",
-    } as never);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "ProductsHome" as never }],
+    });
 
   const handleCancel = () => {
     setIsCancelModalOpen(true);
@@ -37,6 +40,11 @@ export function CreateProduct() {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (isConfirmClickedRef.current === true) {
+        isConfirmClickedRef.current = false;
+        return;
+      }
+
       e.preventDefault();
 
       handleCancel();
@@ -54,8 +62,18 @@ export function CreateProduct() {
     defaultValues: { name: "", description: "", price: 0, quantity: 0 },
   });
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    createProduct(data);
+  const onSubmit = async (data: z.infer<typeof schema>) => {
+    try {
+      await createProduct(data);
+      isConfirmClickedRef.current = true;
+    } catch {
+      Toast.show({
+        type: "error",
+        text1: "Error creating product",
+      });
+      isConfirmClickedRef.current = false;
+      return;
+    }
     navigateHome();
   };
 
@@ -125,7 +143,11 @@ export function CreateProduct() {
         subTitle="This action cannot be undone."
         cancelModalOpen={isCancelModalOpen}
         setCancelModalOpen={setIsCancelModalOpen}
-        onConfirmCancel={() => navigation.navigate("ProductsHome" as never)}
+        onConfirmCancel={() => {
+          isConfirmClickedRef.current = true;
+          setIsCancelModalOpen(false);
+          navigateHome();
+        }}
       />
     </ParallaxScrollView>
   );

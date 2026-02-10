@@ -11,7 +11,7 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import * as Crypto from "expo-crypto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "../generic/button";
@@ -36,14 +36,20 @@ export default function ReviewOrder({
   const [cameraLoading, setCameraLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const navigateHome = () => {
-    navigation.navigate({
-      name: "CaptureHome",
-      params: {
-        selectedProducts: selectedProducts,
-        totalAmount: total,
-      },
-    } as never);
+  const navigateHome = (params?: any) => {
+    if (params) {
+      navigation.reset({
+        index: 0,
+        name: "CaptureHome",
+        params: params,
+      } as never);
+      return;
+    } else {
+      navigation.reset({
+        index: 0,
+        name: "CaptureHome",
+      } as never);
+    }
   };
 
   const handleEPayment = () => {
@@ -85,6 +91,23 @@ export default function ReviewOrder({
   useFocusEffect(() => {
     setCameraLoading(false);
   });
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      const actionType = e.data?.action?.type;
+
+      if (actionType === "GO_BACK" || actionType === "POP") {
+        e.preventDefault();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "CaptureHome" as never }],
+        });
+        return;
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <ParallaxScrollView

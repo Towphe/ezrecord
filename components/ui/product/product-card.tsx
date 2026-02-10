@@ -1,28 +1,47 @@
 import { ActionButton } from "@/components/action-button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useDeleteProduct } from "@/hooks/delete-product";
 import { Product } from "@/types/products";
-import { useNavigation } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Modal, Pressable, StyleSheet } from "react-native";
-import { DeleteProductModal } from "./delete-modal";
+import { CancelModal } from "../generic/cancel-modal";
 
-export function ProductCard({ productId, name, quantity, price }: Product) {
-  const navigation = useNavigation<any>();
+type ProductCardProps = Product & { onDeleted?: () => void };
+
+export function ProductCard({
+  productId,
+  name,
+  quantity,
+  price,
+  onDeleted,
+}: ProductCardProps) {
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [deletedModalVisible, setDeletedModalVisible] =
-    useState<boolean>(false);
+  const { deleteProduct } = useDeleteProduct(productId);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   const handleEditPress = () => {
-    navigation.navigate("EditProduct", { productId: productId });
-  };
-
-  const handleDeletePress = () => {
-    setDeletedModalVisible(true);
+    navigation.navigate({
+      name: "EditProduct",
+      params: { productId: productId },
+    } as never);
   };
 
   const handleCancel = () => {
     setModalVisible(false);
+  };
+
+  const handleDeleteTransaction = () => {
+    setDeleteConfirmationOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    await deleteProduct();
+    setDeleteConfirmationOpen(false);
+    setModalVisible(false);
+    onDeleted?.();
   };
 
   return (
@@ -45,13 +64,7 @@ export function ProductCard({ productId, name, quantity, price }: Product) {
                 <ActionButton
                   title="Delete Product"
                   color="red"
-                  onPress={handleDeletePress}
-                />
-                <DeleteProductModal
-                  productId={productId}
-                  setModalVisible={setModalVisible}
-                  deletedModalVisible={deletedModalVisible}
-                  setDeletedModalVisible={setDeletedModalVisible}
+                  onPress={handleDeleteTransaction}
                 />
               </ThemedView>
             </Pressable>
@@ -61,6 +74,13 @@ export function ProductCard({ productId, name, quantity, price }: Product) {
       <ThemedView>
         <ThemedText style={styles.quantity}>Quantity: {quantity}</ThemedText>
       </ThemedView>
+      <CancelModal
+        title="Delete Product"
+        subTitle="This action cannot be undone. Transactions with this product will not be deleted."
+        cancelModalOpen={deleteConfirmationOpen}
+        setCancelModalOpen={() => setDeleteConfirmationOpen(false)}
+        onConfirmCancel={handleConfirmDelete}
+      />
     </Pressable>
   );
 }

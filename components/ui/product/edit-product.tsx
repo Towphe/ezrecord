@@ -10,9 +10,10 @@ import { useProduct } from "@/hooks/use-product";
 import zodResolver from "@/utils/zodResolver";
 import { RouteProp } from "@react-navigation/native";
 import { useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
 import * as z from "zod";
 import { Button } from "../generic/button";
 import { CancelModal } from "../generic/cancel-modal";
@@ -24,10 +25,6 @@ const schema = z.object({
   quantity: z.coerce.number().optional(),
 });
 
-type Props = {
-  productId: string;
-};
-
 export function EditProduct({
   route,
 }: {
@@ -38,11 +35,13 @@ export function EditProduct({
   const { product, loading: productLoading } = useProduct(productId);
   const { editProduct } = useEditProduct(productId);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const isConfirmClickedRef = useRef(false);
 
   const navigateToHome = () =>
-    navigation.navigate({
-      name: "ProductsHome",
-    } as never);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "ProductsHome" as never }],
+    });
 
   const handleCancel = () => {
     setIsCancelModalOpen(true);
@@ -50,6 +49,11 @@ export function EditProduct({
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (isConfirmClickedRef.current === true) {
+        isConfirmClickedRef.current = false;
+        return;
+      }
+
       e.preventDefault();
 
       handleCancel();
@@ -86,9 +90,15 @@ export function EditProduct({
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     try {
+      isConfirmClickedRef.current = true;
       await editProduct(data);
     } catch (err) {
-      console.error("Failed to edit product", err);
+      Toast.show({
+        type: "error",
+        text1: "Error editing product",
+      });
+      isConfirmClickedRef.current = false;
+      return;
     }
 
     navigateToHome();
@@ -181,7 +191,11 @@ export function EditProduct({
         subTitle="This action cannot be undone."
         cancelModalOpen={isCancelModalOpen}
         setCancelModalOpen={setIsCancelModalOpen}
-        onConfirmCancel={() => navigation.navigate("ProductsHome" as never)}
+        onConfirmCancel={() => {
+          isConfirmClickedRef.current = true;
+          setIsCancelModalOpen(false);
+          navigateToHome();
+        }}
       />
     </ParallaxScrollView>
   );

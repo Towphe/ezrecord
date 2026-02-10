@@ -75,11 +75,31 @@ export default function TransactionView({
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
+  const navigateHome = () =>
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "TransactionsHome" as never }],
+    });
+
   useEffect(() => {
     if (!transaction && !transactionLoading) {
       navigation.goBack();
     }
   }, [transaction, transactionLoading, navigation]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      const actionType = e.data?.action?.type;
+
+      if (actionType === "GO_BACK" || actionType === "POP") {
+        e.preventDefault();
+        navigateHome();
+        return;
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   if (transactionLoading) {
     return (
@@ -99,8 +119,6 @@ export default function TransactionView({
       params: { transaction: transaction! },
     } as never);
   };
-
-  const navigateHome = () => navigation.navigate("TransactionsHome" as never);
 
   const handleConfirmDeleteTransaction = async () => {
     await deleteTransaction();

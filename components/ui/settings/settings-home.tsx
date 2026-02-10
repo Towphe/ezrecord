@@ -16,10 +16,6 @@ export default function SettingsHome() {
     await clearData();
     setDeletedModalVisible(false);
 
-    // go to statistics home found in separate screen stack to avoid issues with resetting the navigation state after clearing data
-    // navigation.navigate({
-    //   name: "StatisticsHome",
-    // } as never);
     router.navigate("/");
   };
 
